@@ -28,7 +28,8 @@
     "lint": "n8n-node lint",
     "lint:fix": "n8n-node lint --fix",
     "release": "n8n-node release",
-    "prepublishOnly": "n8n-node prerelease"
+    "prepublishOnly": "n8n-node prerelease",
+    "test": "node --import tsx --test 'tests/**/*.test.ts'"
   },
   "files": [
     "dist"
@@ -57,6 +58,7 @@
     "eslint": "9.32.0",
     "prettier": "3.8.1",
     "release-it": "^19.2.4",
+    "tsx": "^4.21.0",
     "typescript": "5.9.3"
   },
   "peerDependencies": {

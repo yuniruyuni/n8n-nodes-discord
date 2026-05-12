@@ -17,7 +17,17 @@ import {
 	type DiscordMultipartFile,
 } from '../shared/attachments';
 import { createAuditLogReasonField } from '../shared/auditLog';
-import { createComponentsJsonField } from '../shared/components';
+import {
+	buildButtonsActionRow,
+	buildMentionableSelectActionRow,
+	buildStringSelectActionRow,
+	createButtonComponentsField,
+	createComponentsJsonField,
+	createMentionableSelectComponentField,
+	createStringSelectComponentField,
+	validateComponents,
+	type DiscordComponent,
+} from '../shared/components';
 import { buildEmbedsFromCollection, createEmbedsCollectionField } from '../shared/embeds';
 import { parseOptionalJsonField } from '../shared/messagePayload';
 
@@ -154,10 +164,28 @@ function buildExecutePayload(context: IExecuteSingleFunctions): {
 		payload.embeds = embeds;
 	}
 
+	// Guided builders compose action rows first; raw JSON `components` is then
+	// appended as an escape hatch (e.g. v2 layout) rather than overriding them.
+	const rows: DiscordComponent[] = [];
+
+	const buttonRowRaw = context.getNodeParameter('buttonRow', {}) as unknown;
+	rows.push(...buildButtonsActionRow(buttonRowRaw));
+
+	const stringSelectRaw = context.getNodeParameter('stringSelect', {}) as unknown;
+	rows.push(...buildStringSelectActionRow(stringSelectRaw));
+
+	const mentionableSelectRaw = context.getNodeParameter('mentionableSelect', {}) as unknown;
+	rows.push(...buildMentionableSelectActionRow(mentionableSelectRaw));
+
 	const componentsRaw = context.getNodeParameter('components', '') as unknown;
 	const components = parseOptionalJsonField<unknown>(componentsRaw, 'Components');
 	if (Array.isArray(components) && components.length > 0) {
-		payload.components = components;
+		rows.push(...(components as DiscordComponent[]));
+	}
+
+	if (rows.length > 0) {
+		validateComponents(rows);
+		payload.components = rows as unknown as IDataObject[];
 	}
 
 	const allowedMentionsValue = context.getNodeParameter('allowedMentions', {}) as unknown;
@@ -197,10 +225,28 @@ function buildEditMessagePayload(context: IExecuteSingleFunctions): {
 		payload.embeds = embeds;
 	}
 
+	// Guided builders compose action rows first; raw JSON `components` is then
+	// appended as an escape hatch (e.g. v2 layout) rather than overriding them.
+	const rows: DiscordComponent[] = [];
+
+	const buttonRowRaw = context.getNodeParameter('buttonRow', {}) as unknown;
+	rows.push(...buildButtonsActionRow(buttonRowRaw));
+
+	const stringSelectRaw = context.getNodeParameter('stringSelect', {}) as unknown;
+	rows.push(...buildStringSelectActionRow(stringSelectRaw));
+
+	const mentionableSelectRaw = context.getNodeParameter('mentionableSelect', {}) as unknown;
+	rows.push(...buildMentionableSelectActionRow(mentionableSelectRaw));
+
 	const componentsRaw = context.getNodeParameter('components', '') as unknown;
 	const components = parseOptionalJsonField<unknown>(componentsRaw, 'Components');
-	if (Array.isArray(components)) {
-		payload.components = components;
+	if (Array.isArray(components) && components.length > 0) {
+		rows.push(...(components as DiscordComponent[]));
+	}
+
+	if (rows.length > 0) {
+		validateComponents(rows);
+		payload.components = rows as unknown as IDataObject[];
 	}
 
 	const allowedMentionsValue = context.getNodeParameter('allowedMentions', {}) as unknown;
@@ -861,6 +907,36 @@ const embedsField = createEmbedsCollectionField({
 	},
 });
 
+const buttonRowField = createButtonComponentsField({
+	displayOptions: {
+		show: {
+			resource: ['webhook'],
+			operation: ['execute', 'editMessage'],
+		},
+	},
+	name: 'buttonRow',
+});
+
+const stringSelectField = createStringSelectComponentField({
+	displayOptions: {
+		show: {
+			resource: ['webhook'],
+			operation: ['execute', 'editMessage'],
+		},
+	},
+	name: 'stringSelect',
+});
+
+const mentionableSelectField = createMentionableSelectComponentField({
+	displayOptions: {
+		show: {
+			resource: ['webhook'],
+			operation: ['execute', 'editMessage'],
+		},
+	},
+	name: 'mentionableSelect',
+});
+
 const componentsField = createComponentsJsonField({
 	displayOptions: {
 		show: {
@@ -920,6 +996,9 @@ export const webhookFields: INodeProperties[] = [
 	threadIdField,
 	waitField,
 	embedsField,
+	buttonRowField,
+	stringSelectField,
+	mentionableSelectField,
 	componentsField,
 	attachmentsField,
 	allowedMentionsField,

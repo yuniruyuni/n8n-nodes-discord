@@ -1,34 +1,32 @@
 # n8n-nodes-discord
 
-Discord API連携用のn8n Community Nodeパッケージです。REST APIリソース、Gatewayイベント、Webhooks、Interactions、OAuth2、Permissions、Monetization系リソースまで広く網羅する方針で開発しています。
+Discord API 連携用の n8n Community Node パッケージです。REST リソース、Gateway イベント、HTTP インタラクション、Webhook、OAuth2、Permissions、Monetization など Discord Developer Platform を広くカバーしています。
 
 [English](README.md) | 日本語
 
-## 現在の開発状況
+## リソース
 
-このリポジトリは `n8n-nodes-twitch` の設計パターンを元に初期構築した段階です。
+`Discord` REST ノードは26リソースを提供します:
 
-実装済みの縦スライス:
+Application, ApplicationCommand, ApplicationRoleConnectionMetadata, AuditLog, AutoModeration, Channel, Emoji, Entitlement, Guild, GuildScheduledEvent, GuildTemplate, InteractionResponse, Invite, Lobby, Member, Message, Poll, Role, SKU, Soundboard, StageInstance, Sticker, Subscription, User, Voice, Webhook。
 
-- Discord Bot API credential
-- Discord OAuth2 credential scaffold
-- Discord Webhook credential scaffold
-- Discord Interaction credential scaffold
-- `Discord` node
-  - User: current bot user取得、user取得
-  - Message: 送信、取得、削除
-  - Webhook: execute、取得
-- `Discord Trigger` node
-  - Gateway接続
-  - Identify
-  - Heartbeat / ACK監視
-  - session state保存
-  - 再接続
-  - 主要イベントの初期selector
+Message、Webhook、InteractionResponse は embeds、attachments（multipart アップロード対応）、allowed mentions の guided builder と、components の raw JSON 入力をサポートします。ApplicationCommand は localization、contexts、integration types、permission フィールドに対応。サーバー側の変更操作には audit log reason フィールドが付きます。
 
-全網羅TODO:
+## Trigger
 
-- [docs/discord-full-coverage-todo.md](docs/discord-full-coverage-todo.md)
+- `Discord Trigger` — WebSocket 経由の Gateway 接続。Identify、heartbeat、resume、reconnect、session 永続化をサポート。全 Gateway イベントカタログから選択でき、privileged intent のメタデータも付与されています。
+- `Discord HTTP Interaction Trigger` — HTTPS 経由で Discord application interaction を受信。Ed25519 署名検証と PING/PONG の自動応答を内蔵。
+
+## Credentials
+
+- `Discord Bot API` — Bot トークン、`Authorization: Bot <token>` ヘッダ。
+- `Discord OAuth2 API` — Authorization Code Grant（ユーザートークン用フロー）。
+- `Discord Webhook API` — 受信用 Webhook URL。
+- `Discord Interaction API` — application ID と Ed25519 public key（HTTP インタラクション用）。
+
+## カバレッジ
+
+公式 Discord ドキュメントの index に対するリソース単位のステータスは [`docs/coverage-matrix.md`](docs/coverage-matrix.md) を参照してください。実装チェックリストは [`docs/discord-full-coverage-todo.md`](docs/discord-full-coverage-todo.md) です。ワークフロー例は [`docs/examples/`](docs/examples/) にあります。
 
 ## 開発
 
@@ -39,19 +37,22 @@ npm run lint
 npm run dev
 ```
 
-## Discord側の準備
+## Discord 側の準備
 
-1. Discord Developer Portalでapplicationを作成します。
-2. Botを追加します。
-3. Bot tokenを `Discord Bot API` credential に設定します。
-4. Triggerでprivileged intentが必要なイベントを使う場合はDeveloper Portalで該当intentを有効化します。
-5. 必要な権限を付けてBotをサーバーへ招待します。
+1. Discord Developer Portal で application を作成します。
+2. Bot を追加します。
+3. Bot token を `Discord Bot API` credential に設定します。
+4. Trigger で privileged intent が必要なイベントを使う場合は Developer Portal で該当 intent (GUILD_MEMBERS、GUILD_PRESENCES、MESSAGE_CONTENT) を有効化します。
+5. 必要な権限を付けて Bot をサーバーへ招待します。
+6. HTTP インタラクションを使う場合は、application の Interactions Endpoint URL を `Discord HTTP Interaction Trigger` が生成する URL に設定し、application の public key を `Discord Interaction API` credential に登録します。
 
 ## アーキテクチャ
 
-RESTノードは可能な範囲でn8nのdeclarative routingを使います。embeds、components、attachments、application commands、interaction responsesのような複雑なpayloadは、shared builderとraw JSON fallbackを併用する予定です。
+REST ノードは n8n の declarative routing を採用しています。embeds、components、attachments、allowed mentions、application commands、interaction responses など複雑な payload は shared builder と raw JSON fallback を併用します。
 
-TriggerノードはDiscord Gateway WebSocketを使います。heartbeat ACK、session ID、sequence number、reconnect stateを管理し、今後resumeとshardingを強化します。
+Gateway Trigger は Discord Gateway WebSocket を使います。heartbeat ACK、session ID、sequence number、reconnect state を管理し、`nodes/DiscordTrigger/events/` に privileged intent とイベント別 required intent のメタデータを持ちます。
+
+HTTP インタラクション Trigger は Node 組み込みの `node:crypto`（Ed25519）で署名検証を行い、サードパーティ依存を持ちません。
 
 ## License
 

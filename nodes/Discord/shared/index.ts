@@ -6,6 +6,7 @@ export * from './constants';
 export * from './embeds';
 export * from './intents';
 export * from './messagePayload';
+export * from './oauth2';
 export * from './pagination';
 export * from './permissions';
 export * from './rateLimits';

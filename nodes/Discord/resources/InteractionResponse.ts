@@ -21,7 +21,19 @@ import {
 	createEmbedsCollectionField,
 	validateEmbeds,
 } from '../shared/embeds';
-import { createComponentsJsonField } from '../shared/components';
+import {
+	buildButtonsActionRow,
+	buildMentionableSelectActionRow,
+	buildStringSelectActionRow,
+	buildTextInputsActionRow,
+	createButtonComponentsField,
+	createComponentsJsonField,
+	createMentionableSelectComponentField,
+	createStringSelectComponentField,
+	createTextInputComponentField,
+	validateComponents,
+	type DiscordComponent,
+} from '../shared/components';
 import { parseOptionalJsonField, createRawJsonField } from '../shared/messagePayload';
 
 const successResponse = {
@@ -150,10 +162,28 @@ function buildMessagePayload(
 		data.embeds = embeds;
 	}
 
+	const rows: DiscordComponent[] = [];
+
+	const buttonRowRaw = this.getNodeParameter('buttonRow', {}) as unknown;
+	rows.push(...buildButtonsActionRow(buttonRowRaw));
+
+	const stringSelectRaw = this.getNodeParameter('stringSelect', {}) as unknown;
+	rows.push(...buildStringSelectActionRow(stringSelectRaw));
+
+	const mentionableSelectRaw = this.getNodeParameter('mentionableSelect', {}) as unknown;
+	rows.push(...buildMentionableSelectActionRow(mentionableSelectRaw));
+
+	// Raw JSON components are appended after the guided rows, acting as an
+	// escape hatch / extension (e.g. v2 layout) rather than overriding the GUI.
 	const componentsRaw = this.getNodeParameter('components', '') as string;
-	const components = parseOptionalJsonField<unknown>(componentsRaw, 'components');
-	if (components !== undefined) {
-		data.components = components as IDataObject[];
+	const componentsJson = parseOptionalJsonField<unknown>(componentsRaw, 'components');
+	if (Array.isArray(componentsJson)) {
+		rows.push(...(componentsJson as DiscordComponent[]));
+	}
+
+	if (rows.length > 0) {
+		validateComponents(rows);
+		data.components = rows as unknown as IDataObject[];
 	}
 
 	const allowedMentions = buildAllowedMentionsFromCollection(
@@ -211,16 +241,29 @@ function buildModalData(this: IExecuteSingleFunctions): IDataObject {
 		throw new Error('Modal responses require a title');
 	}
 
+	const rows: DiscordComponent[] = [];
+
+	// Guided text inputs: each input becomes its own action row (Discord requirement).
+	const textInputsRaw = this.getNodeParameter('modalTextInputs', {}) as unknown;
+	rows.push(...buildTextInputsActionRow(textInputsRaw));
+
+	// Raw JSON modalComponents are appended after the guided rows as an escape hatch.
 	const componentsRaw = this.getNodeParameter('modalComponents', '[]') as string;
-	const components = parseOptionalJsonField<unknown>(componentsRaw, 'modalComponents');
-	if (!Array.isArray(components)) {
-		throw new Error('Modal components must be a JSON array of action rows');
+	const componentsJson = parseOptionalJsonField<unknown>(componentsRaw, 'modalComponents');
+	if (Array.isArray(componentsJson)) {
+		rows.push(...(componentsJson as DiscordComponent[]));
 	}
+
+	if (rows.length === 0) {
+		throw new Error('Modal responses require at least one text input or raw component row');
+	}
+
+	validateComponents(rows);
 
 	return {
 		custom_id: customId,
 		title,
-		components,
+		components: rows as unknown as IDataObject[],
 	};
 }
 
@@ -594,6 +637,63 @@ export const interactionResponseFields: INodeProperties[] = [
 			},
 		},
 	}),
+	createButtonComponentsField({
+		displayOptions: {
+			show: {
+				resource: ['interactionResponse'],
+				operation: messageFieldOperations,
+			},
+			hide: {
+				operation: ['createInitialCallback'],
+				responseType: [
+					INTERACTION_CALLBACK_TYPE.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
+					INTERACTION_CALLBACK_TYPE.DEFERRED_UPDATE_MESSAGE,
+					INTERACTION_CALLBACK_TYPE.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT,
+					INTERACTION_CALLBACK_TYPE.MODAL,
+					INTERACTION_CALLBACK_TYPE.LAUNCH_ACTIVITY,
+				],
+			},
+		},
+		name: 'buttonRow',
+	}),
+	createStringSelectComponentField({
+		displayOptions: {
+			show: {
+				resource: ['interactionResponse'],
+				operation: messageFieldOperations,
+			},
+			hide: {
+				operation: ['createInitialCallback'],
+				responseType: [
+					INTERACTION_CALLBACK_TYPE.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
+					INTERACTION_CALLBACK_TYPE.DEFERRED_UPDATE_MESSAGE,
+					INTERACTION_CALLBACK_TYPE.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT,
+					INTERACTION_CALLBACK_TYPE.MODAL,
+					INTERACTION_CALLBACK_TYPE.LAUNCH_ACTIVITY,
+				],
+			},
+		},
+		name: 'stringSelect',
+	}),
+	createMentionableSelectComponentField({
+		displayOptions: {
+			show: {
+				resource: ['interactionResponse'],
+				operation: messageFieldOperations,
+			},
+			hide: {
+				operation: ['createInitialCallback'],
+				responseType: [
+					INTERACTION_CALLBACK_TYPE.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
+					INTERACTION_CALLBACK_TYPE.DEFERRED_UPDATE_MESSAGE,
+					INTERACTION_CALLBACK_TYPE.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT,
+					INTERACTION_CALLBACK_TYPE.MODAL,
+					INTERACTION_CALLBACK_TYPE.LAUNCH_ACTIVITY,
+				],
+			},
+		},
+		name: 'mentionableSelect',
+	}),
 	createComponentsJsonField({
 		displayOptions: {
 			show: {
@@ -762,10 +862,20 @@ export const interactionResponseFields: INodeProperties[] = [
 		},
 		description: 'Modal title displayed to the user. Max 45 characters.',
 	},
+	createTextInputComponentField({
+		displayOptions: {
+			show: {
+				resource: ['interactionResponse'],
+				operation: ['createInitialCallback'],
+				responseType: [INTERACTION_CALLBACK_TYPE.MODAL],
+			},
+		},
+		name: 'modalTextInputs',
+	}),
 	createRawJsonField(
 		'Modal Components',
 		'modalComponents',
-		'Raw JSON array of action rows containing text inputs for the modal',
+		'Raw JSON array of action rows containing text inputs for the modal. Appended after guided text inputs as an escape hatch.',
 		'[{"type":1,"components":[{"type":4,"custom_id":"name","label":"Name","style":1}]}]',
 		{
 			displayOptions: {

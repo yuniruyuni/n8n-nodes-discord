@@ -16,15 +16,24 @@ import {
 	type DiscordAttachmentInput,
 	type DiscordMultipartFile,
 } from '../shared/attachments';
-import { createComponentsJsonField } from '../shared/components';
+import {
+	buildButtonsActionRow,
+	buildMentionableSelectActionRow,
+	buildStringSelectActionRow,
+	createButtonComponentsField,
+	createComponentsJsonField,
+	createMentionableSelectComponentField,
+	createStringSelectComponentField,
+	validateComponents,
+	type DiscordComponent,
+} from '../shared/components';
 import { buildEmbedsFromCollection, createEmbedsCollectionField } from '../shared/embeds';
 import { parseOptionalJsonField } from '../shared/messagePayload';
 
-// Components are intentionally exposed as raw JSON here: the guided button and
-// select builders ship in shared/components.ts but pulling them into Message
-// (send + edit) adds significant surface area. Raw JSON keeps the v2 layout
-// path open and matches Discord's components[] shape; guided builders may be
-// added in a later pass.
+// Guided builders (buttonRow / stringSelect / mentionableSelect) compose the
+// action rows first; entries from the raw JSON `components` field are then
+// appended afterwards as an escape hatch for v2 layout / shapes the builders
+// don't cover.
 
 type MessagePayload = IDataObject;
 
@@ -79,10 +88,28 @@ function buildPayloadFromParameters(ctx: IExecuteSingleFunctions): {
 		payload.embeds = embeds as unknown as IDataObject[];
 	}
 
+	const rows: DiscordComponent[] = [];
+
+	const buttonRowRaw = ctx.getNodeParameter('buttonRow', {}) as unknown;
+	rows.push(...buildButtonsActionRow(buttonRowRaw));
+
+	const stringSelectRaw = ctx.getNodeParameter('stringSelect', {}) as unknown;
+	rows.push(...buildStringSelectActionRow(stringSelectRaw));
+
+	const mentionableSelectRaw = ctx.getNodeParameter('mentionableSelect', {}) as unknown;
+	rows.push(...buildMentionableSelectActionRow(mentionableSelectRaw));
+
+	// Raw JSON entries are appended after the guided rows so they act as an
+	// escape hatch / extension (e.g. v2 layout) rather than overriding the GUI.
 	const componentsRaw = ctx.getNodeParameter('components', '') as unknown;
 	const components = parseOptionalJsonField<IDataObject[]>(componentsRaw, 'Components');
 	if (Array.isArray(components) && components.length > 0) {
-		payload.components = components;
+		rows.push(...(components as unknown as DiscordComponent[]));
+	}
+
+	if (rows.length > 0) {
+		validateComponents(rows);
+		payload.components = rows as unknown as IDataObject[];
 	}
 
 	const allowedMentionsRaw = ctx.getNodeParameter('allowedMentions', {}) as unknown;
@@ -479,6 +506,33 @@ export const messageFields: INodeProperties[] = [
 				operation: writeOperations,
 			},
 		},
+	}),
+	createButtonComponentsField({
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: writeOperations,
+			},
+		},
+		name: 'buttonRow',
+	}),
+	createStringSelectComponentField({
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: writeOperations,
+			},
+		},
+		name: 'stringSelect',
+	}),
+	createMentionableSelectComponentField({
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: writeOperations,
+			},
+		},
+		name: 'mentionableSelect',
 	}),
 	createComponentsJsonField({
 		displayOptions: {
