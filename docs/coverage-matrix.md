@@ -71,7 +71,7 @@ Status legend:
 
 | Area | Status | Current implementation | Planned next coverage | Boundary notes |
 | --- | --- | --- | --- | --- |
-| OAuth2 | Current | OAuth2 credential with authorization/token URLs, scopes, refresh; `Discord OAuth2` node exposes bot install URL builder, authorize URL builder, token revocation URL as workflow operations; `shared/oauth2.ts` with 33-scope option list | Per-op credential selection on the Discord REST node | User-token/self-bot automation remains unsupported. |
+| OAuth2 | Current | OAuth2 credential with authorization/token URLs, scopes, refresh; `Discord` REST node has an `Authentication` selector toggling between `discordBotApi` and `discordOAuth2Api`; `Discord OAuth2` node exposes bot install URL builder, authorize URL builder, token revocation URL as workflow operations; `shared/oauth2.ts` with 33-scope option list | None planned | User-token/self-bot automation remains unsupported. |
 | Permissions | Current | Permission constants, options, aggregation, checks; guided `defaultMemberPermissionsFlags` on application commands; guided `allowFlags`/`denyFlags` on Channel `editChannelPermissions`; raw bitfield strings preserved as escape hatches | None planned | Values aligned with official Permissions topic. |
 | Rate Limits | Current partial | `shared/rateLimits.ts` parsers and helpers; n8n HTTP retry remains the runtime behavior | Optional custom retry on top of parsers if n8n's default proves insufficient | Custom throttling avoided unless required. |
 | Opcodes and Status Codes | Current | Gateway opcode handling; close-code map (`closeCodes.ts`) covering 4000-4014 with reconnect flag | Wire close-code metadata into trigger diagnostics output | Mostly internal protocol support. |

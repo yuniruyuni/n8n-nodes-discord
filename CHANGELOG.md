@@ -65,6 +65,13 @@
 - `Discord OAuth2` — pure-compute helper exposing Bot install URL,
   OAuth2 authorize URL, and the token revocation URL as workflow
   operations.
+- `Discord` REST node now has a top-level `Authentication` selector
+  switching between `discordBotApi` (bot token) and `discordOAuth2Api`
+  (user token). Operations that require user OAuth2 (e.g., User
+  resource's `getCurrentConnections`,
+  `getCurrentApplicationRoleConnection`,
+  `updateCurrentApplicationRoleConnection`, `createGroupDm`) now have
+  a workable credential path.
 
 #### Shared helpers
 

@@ -22,6 +22,12 @@ export class Discord implements INodeType {
 			{
 				name: 'discordBotApi',
 				required: true,
+				displayOptions: { show: { authentication: ['bot'] } },
+			},
+			{
+				name: 'discordOAuth2Api',
+				required: true,
+				displayOptions: { show: { authentication: ['oauth2'] } },
 			},
 		],
 		requestDefaults: {
@@ -32,6 +38,19 @@ export class Discord implements INodeType {
 			},
 		},
 		properties: [
+			{
+				displayName: 'Authentication',
+				name: 'authentication',
+				type: 'options',
+				noDataExpression: true,
+				options: [
+					{ name: 'Bot Token', value: 'bot' },
+					{ name: 'OAuth2 (User Token)', value: 'oauth2' },
+				],
+				default: 'bot',
+				description:
+					'Bot tokens are used for server automation. OAuth2 user tokens are required for operations that act on behalf of a specific user (e.g., list current user guilds, get user connections, create group DM, update role connection).',
+			},
 			{
 				displayName: 'Resource',
 				name: 'resource',
