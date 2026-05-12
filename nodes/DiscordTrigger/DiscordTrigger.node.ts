@@ -1,0 +1,53 @@
+import {
+	NodeConnectionTypes,
+	type IDataObject,
+	type INodeType,
+	type INodeTypeDescription,
+	type ITriggerFunctions,
+	type ITriggerResponse,
+} from 'n8n-workflow';
+
+import { DiscordGatewayConnection } from './DiscordGatewayConnection';
+import { triggerProperties } from './events';
+
+export class DiscordTrigger implements INodeType {
+	description: INodeTypeDescription = {
+		displayName: 'Discord Trigger',
+		name: 'discordTrigger',
+		icon: { light: 'file:discord.svg', dark: 'file:discord.dark.svg' },
+		group: ['trigger'],
+		version: 1,
+		subtitle: '={{$parameter["event"]}}',
+		description: 'Listen to Discord Gateway events via WebSocket',
+		defaults: {
+			name: 'Discord Trigger',
+		},
+		usableAsTool: true,
+		inputs: [],
+		outputs: [NodeConnectionTypes.Main],
+		credentials: [
+			{
+				name: 'discordBotApi',
+				required: true,
+			},
+		],
+		properties: triggerProperties,
+	};
+
+	async trigger(this: ITriggerFunctions): Promise<ITriggerResponse> {
+		const event = this.getNodeParameter('event') as string;
+
+		const onEvent = (eventData: IDataObject) => {
+			this.emit([this.helpers.returnJsonArray([eventData])]);
+		};
+
+		const connection = new DiscordGatewayConnection(this, event, onEvent);
+		await connection.connect();
+
+		return {
+			closeFunction: async () => {
+				connection.close();
+			},
+		};
+	}
+}

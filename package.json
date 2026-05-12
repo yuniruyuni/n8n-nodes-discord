@@ -1,0 +1,67 @@
+{
+  "name": "@yuniruyuni/n8n-nodes-discord",
+  "version": "0.1.0",
+  "description": "n8n node for Discord API integration. Supports Discord REST operations, webhooks, interactions, and Gateway triggers.",
+  "license": "MIT",
+  "homepage": "https://github.com/yuniruyuni/n8n-nodes-discord",
+  "keywords": [
+    "n8n-community-node-package",
+    "n8n",
+    "discord",
+    "gateway",
+    "webhook",
+    "interactions",
+    "bot"
+  ],
+  "author": {
+    "name": "yuniruyuni",
+    "email": "yuniruyuni@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yuniruyuni/n8n-nodes-discord.git"
+  },
+  "scripts": {
+    "build": "n8n-node build",
+    "build:watch": "tsc --watch",
+    "dev": "n8n-node dev",
+    "lint": "n8n-node lint",
+    "lint:fix": "n8n-node lint --fix",
+    "release": "n8n-node release",
+    "prepublishOnly": "n8n-node prerelease"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=21.0.0"
+  },
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "strict": true,
+    "credentials": [
+      "dist/credentials/DiscordBotApi.credentials.js",
+      "dist/credentials/DiscordOAuth2Api.credentials.js",
+      "dist/credentials/DiscordWebhookApi.credentials.js",
+      "dist/credentials/DiscordInteractionApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/Discord/Discord.node.js",
+      "dist/nodes/DiscordTrigger/DiscordTrigger.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@n8n/node-cli": "*",
+    "@types/node": "^25.5.0",
+    "eslint": "9.32.0",
+    "prettier": "3.8.1",
+    "release-it": "^19.2.4",
+    "typescript": "5.9.3"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
