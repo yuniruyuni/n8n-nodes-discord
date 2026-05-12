@@ -49,6 +49,13 @@ export class DiscordGatewayConnection {
 		}
 	}
 
+	sendCommand(payload: { op: number; d: unknown }): void {
+		if (!this.ws) {
+			throw new Error('Discord Gateway connection is not established');
+		}
+		this.ws.sendCommand(payload);
+	}
+
 	private async getGatewayUrl(): Promise<string> {
 		const response = await this.trigger.helpers.httpRequestWithAuthentication.call(
 			this.trigger,

@@ -91,6 +91,15 @@ export class GatewayWebSocket {
 		};
 	}
 
+	sendCommand(payload: { op: number; d: unknown }): void {
+		if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+			throw new ApplicationError(
+				'Discord Gateway WebSocket is not open; cannot send command',
+			);
+		}
+		this.ws.send(JSON.stringify(payload));
+	}
+
 	private handlePayload(
 		payload: IDataObject,
 		options: GatewayIdentifyOptions,

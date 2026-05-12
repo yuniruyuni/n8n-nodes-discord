@@ -49,7 +49,8 @@
     "nodes": [
       "dist/nodes/Discord/Discord.node.js",
       "dist/nodes/DiscordTrigger/DiscordTrigger.node.js",
-      "dist/nodes/DiscordHttpInteractionTrigger/DiscordHttpInteractionTrigger.node.js"
+      "dist/nodes/DiscordHttpInteractionTrigger/DiscordHttpInteractionTrigger.node.js",
+      "dist/nodes/DiscordGatewayCommand/DiscordGatewayCommand.node.js"
     ]
   },
   "devDependencies": {

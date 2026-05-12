@@ -9,6 +9,7 @@ import {
 
 import { DiscordGatewayConnection } from './DiscordGatewayConnection';
 import { triggerProperties } from './events';
+import { registerGatewaySender, unregisterGatewaySender } from './gatewaySendBus';
 
 export class DiscordTrigger implements INodeType {
 	description: INodeTypeDescription = {
@@ -36,6 +37,7 @@ export class DiscordTrigger implements INodeType {
 
 	async trigger(this: ITriggerFunctions): Promise<ITriggerResponse> {
 		const event = this.getNodeParameter('event') as string;
+		const connectionName = (this.getNodeParameter('connectionName', 'default') as string) || 'default';
 
 		const onEvent = (eventData: IDataObject) => {
 			this.emit([this.helpers.returnJsonArray([eventData])]);
@@ -44,8 +46,11 @@ export class DiscordTrigger implements INodeType {
 		const connection = new DiscordGatewayConnection(this, event, onEvent);
 		await connection.connect();
 
+		registerGatewaySender(connectionName, (payload) => connection.sendCommand(payload));
+
 		return {
 			closeFunction: async () => {
+				unregisterGatewaySender(connectionName);
 				connection.close();
 			},
 		};

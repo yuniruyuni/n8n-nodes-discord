@@ -106,6 +106,14 @@ export const triggerProperties: INodeProperties[] = [
 		description: 'Discord Gateway event to listen for. Full Gateway event coverage is tracked in the TODO.',
 	},
 	{
+		displayName: 'Connection Name',
+		name: 'connectionName',
+		type: 'string',
+		default: 'default',
+		description:
+			'Identifier used by Discord Gateway Command nodes to route send events to this connection. Use distinct names if you run multiple Discord Triggers in the same n8n instance.',
+	},
+	{
 		displayName: 'Auto Calculate Intents',
 		name: 'autoCalculateIntents',
 		type: 'boolean',
