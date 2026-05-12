@@ -1,34 +1,32 @@
 # n8n-nodes-discord
 
-This is an n8n community node package for Discord API integration. The project is being built for broad Discord Developer Platform coverage: REST API resources, Gateway events, webhooks, interactions, OAuth2, permissions, and monetization resources.
+This is an n8n community node package for Discord API integration with broad Discord Developer Platform coverage: REST resources, Gateway events, HTTP interactions, webhooks, OAuth2, permissions, and monetization.
 
 English | [日本語](README.ja.md)
 
-## Current Development Status
+## Resources
 
-This repository has just been scaffolded from `n8n-nodes-twitch` patterns and is in active development.
+The `Discord` REST node exposes 26 resources:
 
-Implemented vertical slice:
+Application, ApplicationCommand, ApplicationRoleConnectionMetadata, AuditLog, AutoModeration, Channel, Emoji, Entitlement, Guild, GuildScheduledEvent, GuildTemplate, InteractionResponse, Invite, Lobby, Member, Message, Poll, Role, SKU, Soundboard, StageInstance, Sticker, Subscription, User, Voice, Webhook.
 
-- Discord Bot API credential
-- Discord OAuth2 credential scaffold
-- Discord Webhook credential scaffold
-- Discord Interaction credential scaffold
-- `Discord` node
-  - User: get current bot user, get user
-  - Message: send, get, delete
-  - Webhook: execute, get
-- `Discord Trigger` node
-  - Gateway connection
-  - Identify
-  - Heartbeat and ACK monitoring
-  - Session state persistence
-  - Reconnect attempts
-  - Initial event selector for core events
+Message, Webhook, and InteractionResponse support guided builders for embeds, attachments (with multipart upload), and allowed mentions, plus raw JSON for components. ApplicationCommand supports localization, contexts, integration types, and permission fields. Mutating guild operations support an audit log reason field.
 
-Full coverage plan:
+## Triggers
 
-- [docs/discord-full-coverage-todo.md](docs/discord-full-coverage-todo.md)
+- `Discord Trigger` — Gateway connection over WebSocket. Identify, heartbeat, resume, reconnect, session persistence. Event selector across the full Discord Gateway event catalog with privileged intent metadata.
+- `Discord HTTP Interaction Trigger` — receives Discord application interactions via HTTPS webhook with Ed25519 signature verification and automatic PING/PONG handling.
+
+## Credentials
+
+- `Discord Bot API` — bot token with `Authorization: Bot <token>` header.
+- `Discord OAuth2 API` — Authorization Code Grant for user-token flows.
+- `Discord Webhook API` — incoming webhook URL.
+- `Discord Interaction API` — application ID and Ed25519 public key for HTTP interactions.
+
+## Coverage
+
+See [`docs/coverage-matrix.md`](docs/coverage-matrix.md) for the resource-by-resource status against the official Discord docs index. The full implementation checklist lives in [`docs/discord-full-coverage-todo.md`](docs/discord-full-coverage-todo.md).
 
 ## Development
 
@@ -44,14 +42,17 @@ npm run dev
 1. Create an application in the Discord Developer Portal.
 2. Add a bot to the application.
 3. Copy the bot token into the `Discord Bot API` credential.
-4. Enable required Gateway intents in the Developer Portal when using trigger events that need privileged intents.
+4. Enable required Gateway intents in the Developer Portal when using trigger events that need privileged intents (GUILD_MEMBERS, GUILD_PRESENCES, MESSAGE_CONTENT).
 5. Invite the bot to a server with the permissions needed for the operations you want to run.
+6. For HTTP interactions, set the Interactions Endpoint URL on the application to the URL produced by `Discord HTTP Interaction Trigger`, and copy the application's public key into the `Discord Interaction API` credential.
 
 ## Architecture
 
-The REST node follows n8n's declarative routing style where practical. Complex Discord payloads such as embeds, components, attachments, application commands, and interaction responses will use shared builders plus raw JSON fallbacks.
+The REST node follows n8n's declarative routing style. Complex Discord payloads (embeds, components, attachments, allowed mentions, application commands, interaction responses) use shared builders alongside raw JSON fallbacks.
 
-The trigger node uses Discord Gateway over WebSocket. It tracks heartbeat ACKs, session ID, sequence number, and reconnect state so future work can harden resume behavior and sharding.
+The Gateway trigger uses Discord Gateway over WebSocket. It tracks heartbeat ACKs, session ID, sequence number, and reconnect state. Privileged intents and per-event required intents are surfaced via metadata in `nodes/DiscordTrigger/events/`.
+
+The HTTP interactions trigger verifies signatures using Node's built-in `node:crypto` (Ed25519) with no third-party dependency.
 
 ## License
 

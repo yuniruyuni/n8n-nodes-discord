@@ -1,88 +1,99 @@
 import type { INodeProperties } from 'n8n-workflow';
 
 import { gatewayIntentOptions } from '../../Discord/shared/intents';
+import { applicationCommandEvents } from './applicationCommand';
+import { autoModerationEvents } from './autoModeration';
+import { channelThreadEvents } from './channelThread';
+import { coreEvents } from './core';
+import { entitlementEvents } from './entitlement';
+import { guildEvents } from './guild';
+import { guildScheduledEventEvents } from './guildScheduledEvent';
+import { integrationEvents } from './integration';
+import { interactionEvents } from './interaction';
+import { inviteEvents } from './invite';
+import { messageEvents } from './message';
+import { pollEvents } from './poll';
+import { presenceEvents } from './presence';
+import { reactionEvents } from './reaction';
+import { soundboardEvents } from './soundboard';
+import { stageInstanceEvents } from './stageInstance';
+import { subscriptionEvents } from './subscription';
+import { typingEvents } from './typing';
+import type { DiscordEventMeta } from './types';
+import { userEvents } from './user';
+import { voiceEvents } from './voice';
+
+export type { DiscordEventMeta } from './types';
+export { coreEvents } from './core';
+export { applicationCommandEvents } from './applicationCommand';
+export { autoModerationEvents } from './autoModeration';
+export { channelThreadEvents } from './channelThread';
+export { entitlementEvents } from './entitlement';
+export { guildEvents } from './guild';
+export { guildScheduledEventEvents } from './guildScheduledEvent';
+export { integrationEvents } from './integration';
+export { interactionEvents } from './interaction';
+export { inviteEvents } from './invite';
+export { messageEvents } from './message';
+export { pollEvents } from './poll';
+export { presenceEvents } from './presence';
+export { reactionEvents } from './reaction';
+export { soundboardEvents } from './soundboard';
+export { stageInstanceEvents } from './stageInstance';
+export { subscriptionEvents } from './subscription';
+export { typingEvents } from './typing';
+export { userEvents } from './user';
+export { voiceEvents } from './voice';
+
+export const allDiscordGatewayEvents: DiscordEventMeta[] = [
+	...coreEvents,
+	...applicationCommandEvents,
+	...autoModerationEvents,
+	...channelThreadEvents,
+	...entitlementEvents,
+	...guildEvents,
+	...guildScheduledEventEvents,
+	...integrationEvents,
+	...interactionEvents,
+	...inviteEvents,
+	...messageEvents,
+	...reactionEvents,
+	...pollEvents,
+	...presenceEvents,
+	...soundboardEvents,
+	...stageInstanceEvents,
+	...subscriptionEvents,
+	...typingEvents,
+	...userEvents,
+	...voiceEvents,
+];
+
+export const privilegedDiscordGatewayEvents: DiscordEventMeta[] = allDiscordGatewayEvents.filter(
+	(event) => event.privileged === true,
+);
+
+const eventMetaByName: Record<string, DiscordEventMeta> = allDiscordGatewayEvents.reduce(
+	(acc, event) => {
+		acc[event.name] = event;
+		return acc;
+	},
+	{} as Record<string, DiscordEventMeta>,
+);
+
+export function getEventMeta(name: string): DiscordEventMeta | undefined {
+	return eventMetaByName[name];
+}
+
+const eventOptionsFromMeta = allDiscordGatewayEvents
+	.map((event) => ({ name: event.displayName, value: event.name }))
+	.sort((a, b) => a.name.localeCompare(b.name));
 
 export const gatewayEventOptions = [
 	{ name: 'Any Event', value: '*' },
-	{ name: 'Ready', value: 'READY' },
-	{ name: 'Application Command Permissions Update', value: 'APPLICATION_COMMAND_PERMISSIONS_UPDATE' },
-	{ name: 'Auto Moderation Action Execution', value: 'AUTO_MODERATION_ACTION_EXECUTION' },
-	{ name: 'Auto Moderation Rule Create', value: 'AUTO_MODERATION_RULE_CREATE' },
-	{ name: 'Auto Moderation Rule Delete', value: 'AUTO_MODERATION_RULE_DELETE' },
-	{ name: 'Auto Moderation Rule Update', value: 'AUTO_MODERATION_RULE_UPDATE' },
-	{ name: 'Channel Create', value: 'CHANNEL_CREATE' },
-	{ name: 'Channel Delete', value: 'CHANNEL_DELETE' },
-	{ name: 'Channel Info', value: 'CHANNEL_INFO' },
-	{ name: 'Channel Pins Update', value: 'CHANNEL_PINS_UPDATE' },
-	{ name: 'Channel Update', value: 'CHANNEL_UPDATE' },
-	{ name: 'Entitlement Create', value: 'ENTITLEMENT_CREATE' },
-	{ name: 'Entitlement Delete', value: 'ENTITLEMENT_DELETE' },
-	{ name: 'Entitlement Update', value: 'ENTITLEMENT_UPDATE' },
-	{ name: 'Guild Audit Log Entry Create', value: 'GUILD_AUDIT_LOG_ENTRY_CREATE' },
-	{ name: 'Guild Ban Add', value: 'GUILD_BAN_ADD' },
-	{ name: 'Guild Ban Remove', value: 'GUILD_BAN_REMOVE' },
-	{ name: 'Guild Create', value: 'GUILD_CREATE' },
-	{ name: 'Guild Delete', value: 'GUILD_DELETE' },
-	{ name: 'Guild Emojis Update', value: 'GUILD_EMOJIS_UPDATE' },
-	{ name: 'Guild Integrations Update', value: 'GUILD_INTEGRATIONS_UPDATE' },
-	{ name: 'Guild Member Add', value: 'GUILD_MEMBER_ADD' },
-	{ name: 'Guild Member Remove', value: 'GUILD_MEMBER_REMOVE' },
-	{ name: 'Guild Member Update', value: 'GUILD_MEMBER_UPDATE' },
-	{ name: 'Guild Members Chunk', value: 'GUILD_MEMBERS_CHUNK' },
-	{ name: 'Guild Role Create', value: 'GUILD_ROLE_CREATE' },
-	{ name: 'Guild Role Delete', value: 'GUILD_ROLE_DELETE' },
-	{ name: 'Guild Role Update', value: 'GUILD_ROLE_UPDATE' },
-	{ name: 'Guild Scheduled Event Create', value: 'GUILD_SCHEDULED_EVENT_CREATE' },
-	{ name: 'Guild Scheduled Event Delete', value: 'GUILD_SCHEDULED_EVENT_DELETE' },
-	{ name: 'Guild Scheduled Event Update', value: 'GUILD_SCHEDULED_EVENT_UPDATE' },
-	{ name: 'Guild Scheduled Event User Add', value: 'GUILD_SCHEDULED_EVENT_USER_ADD' },
-	{ name: 'Guild Scheduled Event User Remove', value: 'GUILD_SCHEDULED_EVENT_USER_REMOVE' },
-	{ name: 'Guild Soundboard Sound Create', value: 'GUILD_SOUNDBOARD_SOUND_CREATE' },
-	{ name: 'Guild Soundboard Sound Delete', value: 'GUILD_SOUNDBOARD_SOUND_DELETE' },
-	{ name: 'Guild Soundboard Sound Update', value: 'GUILD_SOUNDBOARD_SOUND_UPDATE' },
-	{ name: 'Guild Soundboard Sounds Update', value: 'GUILD_SOUNDBOARD_SOUNDS_UPDATE' },
-	{ name: 'Guild Stickers Update', value: 'GUILD_STICKERS_UPDATE' },
-	{ name: 'Guild Update', value: 'GUILD_UPDATE' },
-	{ name: 'Integration Create', value: 'INTEGRATION_CREATE' },
-	{ name: 'Integration Delete', value: 'INTEGRATION_DELETE' },
-	{ name: 'Integration Update', value: 'INTEGRATION_UPDATE' },
-	{ name: 'Interaction Create', value: 'INTERACTION_CREATE' },
-	{ name: 'Invite Create', value: 'INVITE_CREATE' },
-	{ name: 'Invite Delete', value: 'INVITE_DELETE' },
-	{ name: 'Message Create', value: 'MESSAGE_CREATE' },
-	{ name: 'Message Delete', value: 'MESSAGE_DELETE' },
-	{ name: 'Message Delete Bulk', value: 'MESSAGE_DELETE_BULK' },
-	{ name: 'Message Poll Vote Add', value: 'MESSAGE_POLL_VOTE_ADD' },
-	{ name: 'Message Poll Vote Remove', value: 'MESSAGE_POLL_VOTE_REMOVE' },
-	{ name: 'Message Reaction Add', value: 'MESSAGE_REACTION_ADD' },
-	{ name: 'Message Reaction Remove', value: 'MESSAGE_REACTION_REMOVE' },
-	{ name: 'Message Reaction Remove All', value: 'MESSAGE_REACTION_REMOVE_ALL' },
-	{ name: 'Message Reaction Remove Emoji', value: 'MESSAGE_REACTION_REMOVE_EMOJI' },
-	{ name: 'Message Update', value: 'MESSAGE_UPDATE' },
-	{ name: 'Presence Update', value: 'PRESENCE_UPDATE' },
-	{ name: 'Rate Limited', value: 'RATE_LIMITED' },
-	{ name: 'Soundboard Sounds', value: 'SOUNDBOARD_SOUNDS' },
-	{ name: 'Stage Instance Create', value: 'STAGE_INSTANCE_CREATE' },
-	{ name: 'Stage Instance Delete', value: 'STAGE_INSTANCE_DELETE' },
-	{ name: 'Stage Instance Update', value: 'STAGE_INSTANCE_UPDATE' },
-	{ name: 'Subscription Create', value: 'SUBSCRIPTION_CREATE' },
-	{ name: 'Subscription Delete', value: 'SUBSCRIPTION_DELETE' },
-	{ name: 'Subscription Update', value: 'SUBSCRIPTION_UPDATE' },
-	{ name: 'Thread Create', value: 'THREAD_CREATE' },
-	{ name: 'Thread Delete', value: 'THREAD_DELETE' },
-	{ name: 'Thread List Sync', value: 'THREAD_LIST_SYNC' },
-	{ name: 'Thread Member Update', value: 'THREAD_MEMBER_UPDATE' },
-	{ name: 'Thread Members Update', value: 'THREAD_MEMBERS_UPDATE' },
-	{ name: 'Thread Update', value: 'THREAD_UPDATE' },
-	{ name: 'Typing Start', value: 'TYPING_START' },
-	{ name: 'User Update', value: 'USER_UPDATE' },
-	{ name: 'Voice Channel Effect Send', value: 'VOICE_CHANNEL_EFFECT_SEND' },
-	{ name: 'Voice Channel Start Time Update', value: 'VOICE_CHANNEL_START_TIME_UPDATE' },
-	{ name: 'Voice Channel Status Update', value: 'VOICE_CHANNEL_STATUS_UPDATE' },
-	{ name: 'Voice Server Update', value: 'VOICE_SERVER_UPDATE' },
-	{ name: 'Voice State Update', value: 'VOICE_STATE_UPDATE' },
-	{ name: 'Webhooks Update', value: 'WEBHOOKS_UPDATE' },
+	...eventOptionsFromMeta,
 ];
+
+export const discordTriggerEvents = allDiscordGatewayEvents;
 
 export const triggerProperties: INodeProperties[] = [
 	{
