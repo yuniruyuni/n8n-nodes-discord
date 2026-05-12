@@ -78,7 +78,11 @@
 - `embeds.ts` — types, guided collection builder, transformer,
   validators with Discord limits.
 - `components.ts` — v2 type union, button/select/text-input builders,
-  action-row transformers, validators.
+  action-row transformers, validators. V2 layout components: guided
+  builders for Text Display (10), Separator (14), Media Gallery (12),
+  File (13); Section (9) and Container (17) remain raw-JSON-only.
+  Auto-OR of `IS_COMPONENTS_V2` (flag 32768) when any v2 component is
+  detected in the assembled tree.
 - `allowedMentions.ts` — guided builder with mutual-exclusion
   validation.
 - `attachments.ts` — multipart body assembly via global FormData/Blob,

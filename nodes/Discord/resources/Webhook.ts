@@ -18,14 +18,25 @@ import {
 } from '../shared/attachments';
 import { createAuditLogReasonField } from '../shared/auditLog';
 import {
+	DISCORD_MESSAGE_FLAG_IS_COMPONENTS_V2,
 	buildButtonsActionRow,
+	buildMediaGalleryComponent,
 	buildMentionableSelectActionRow,
+	buildSeparatorComponents,
 	buildStringSelectActionRow,
+	buildTextDisplayComponents,
+	buildV2FileComponents,
 	createButtonComponentsField,
 	createComponentsJsonField,
+	createMediaGalleryField,
 	createMentionableSelectComponentField,
+	createSeparatorComponentField,
 	createStringSelectComponentField,
+	createTextDisplayField,
+	createV2FileComponentField,
+	hasV2LayoutComponents,
 	validateComponents,
+	validateV2Components,
 	type DiscordComponent,
 } from '../shared/components';
 import { buildEmbedsFromCollection, createEmbedsCollectionField } from '../shared/embeds';
@@ -143,10 +154,7 @@ function buildExecutePayload(context: IExecuteSingleFunctions): {
 		payload.tts = true;
 	}
 
-	const flags = readOptionalNumber(context, 'flags');
-	if (flags !== undefined) {
-		payload.flags = flags;
-	}
+	const userFlags = readOptionalNumber(context, 'flags');
 
 	const threadName = readOptionalString(context, 'threadName');
 	if (threadName !== undefined) {
@@ -183,9 +191,35 @@ function buildExecutePayload(context: IExecuteSingleFunctions): {
 		rows.push(...(components as DiscordComponent[]));
 	}
 
+	const textDisplaysRaw = context.getNodeParameter('textDisplays', {}) as unknown;
+	rows.push(...buildTextDisplayComponents(textDisplaysRaw));
+
+	const separatorsRaw = context.getNodeParameter('separators', {}) as unknown;
+	rows.push(...buildSeparatorComponents(separatorsRaw));
+
+	const mediaGalleryRaw = context.getNodeParameter('mediaGallery', {}) as unknown;
+	const mediaGallery = buildMediaGalleryComponent(mediaGalleryRaw);
+	if (mediaGallery !== undefined) {
+		rows.push(mediaGallery);
+	}
+
+	const v2FilesRaw = context.getNodeParameter('v2Files', {}) as unknown;
+	rows.push(...buildV2FileComponents(v2FilesRaw));
+
 	if (rows.length > 0) {
 		validateComponents(rows);
+		validateV2Components(rows);
 		payload.components = rows as unknown as IDataObject[];
+	}
+
+	// Auto-OR the IS_COMPONENTS_V2 flag when any v2 layout component is present;
+	// preserves any flag the user explicitly set in the Flags field.
+	let resolvedFlags = userFlags;
+	if (rows.length > 0 && hasV2LayoutComponents(rows)) {
+		resolvedFlags = (resolvedFlags ?? 0) | DISCORD_MESSAGE_FLAG_IS_COMPONENTS_V2;
+	}
+	if (resolvedFlags !== undefined) {
+		payload.flags = resolvedFlags;
 	}
 
 	const allowedMentionsValue = context.getNodeParameter('allowedMentions', {}) as unknown;
@@ -244,9 +278,31 @@ function buildEditMessagePayload(context: IExecuteSingleFunctions): {
 		rows.push(...(components as DiscordComponent[]));
 	}
 
+	const textDisplaysRaw = context.getNodeParameter('textDisplays', {}) as unknown;
+	rows.push(...buildTextDisplayComponents(textDisplaysRaw));
+
+	const separatorsRaw = context.getNodeParameter('separators', {}) as unknown;
+	rows.push(...buildSeparatorComponents(separatorsRaw));
+
+	const mediaGalleryRaw = context.getNodeParameter('mediaGallery', {}) as unknown;
+	const mediaGallery = buildMediaGalleryComponent(mediaGalleryRaw);
+	if (mediaGallery !== undefined) {
+		rows.push(mediaGallery);
+	}
+
+	const v2FilesRaw = context.getNodeParameter('v2Files', {}) as unknown;
+	rows.push(...buildV2FileComponents(v2FilesRaw));
+
 	if (rows.length > 0) {
 		validateComponents(rows);
+		validateV2Components(rows);
 		payload.components = rows as unknown as IDataObject[];
+	}
+
+	// Auto-OR the IS_COMPONENTS_V2 flag when v2 layout components are present.
+	if (rows.length > 0 && hasV2LayoutComponents(rows)) {
+		const existing = typeof payload.flags === 'number' ? payload.flags : 0;
+		payload.flags = existing | DISCORD_MESSAGE_FLAG_IS_COMPONENTS_V2;
 	}
 
 	const allowedMentionsValue = context.getNodeParameter('allowedMentions', {}) as unknown;
@@ -946,6 +1002,42 @@ const componentsField = createComponentsJsonField({
 	},
 });
 
+const textDisplaysField = createTextDisplayField({
+	displayOptions: {
+		show: {
+			resource: ['webhook'],
+			operation: ['execute', 'editMessage'],
+		},
+	},
+});
+
+const separatorsField = createSeparatorComponentField({
+	displayOptions: {
+		show: {
+			resource: ['webhook'],
+			operation: ['execute', 'editMessage'],
+		},
+	},
+});
+
+const mediaGalleryField = createMediaGalleryField({
+	displayOptions: {
+		show: {
+			resource: ['webhook'],
+			operation: ['execute', 'editMessage'],
+		},
+	},
+});
+
+const v2FilesField = createV2FileComponentField({
+	displayOptions: {
+		show: {
+			resource: ['webhook'],
+			operation: ['execute', 'editMessage'],
+		},
+	},
+});
+
 const attachmentsField = createAttachmentsCollectionField({
 	displayOptions: {
 		show: {
@@ -1000,6 +1092,10 @@ export const webhookFields: INodeProperties[] = [
 	stringSelectField,
 	mentionableSelectField,
 	componentsField,
+	textDisplaysField,
+	separatorsField,
+	mediaGalleryField,
+	v2FilesField,
 	attachmentsField,
 	allowedMentionsField,
 	auditLogReasonField,

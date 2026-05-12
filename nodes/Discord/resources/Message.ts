@@ -17,14 +17,25 @@ import {
 	type DiscordMultipartFile,
 } from '../shared/attachments';
 import {
+	DISCORD_MESSAGE_FLAG_IS_COMPONENTS_V2,
 	buildButtonsActionRow,
+	buildMediaGalleryComponent,
 	buildMentionableSelectActionRow,
+	buildSeparatorComponents,
 	buildStringSelectActionRow,
+	buildTextDisplayComponents,
+	buildV2FileComponents,
 	createButtonComponentsField,
 	createComponentsJsonField,
+	createMediaGalleryField,
 	createMentionableSelectComponentField,
+	createSeparatorComponentField,
 	createStringSelectComponentField,
+	createTextDisplayField,
+	createV2FileComponentField,
+	hasV2LayoutComponents,
 	validateComponents,
+	validateV2Components,
 	type DiscordComponent,
 } from '../shared/components';
 import { buildEmbedsFromCollection, createEmbedsCollectionField } from '../shared/embeds';
@@ -107,8 +118,24 @@ function buildPayloadFromParameters(ctx: IExecuteSingleFunctions): {
 		rows.push(...(components as unknown as DiscordComponent[]));
 	}
 
+	const textDisplaysRaw = ctx.getNodeParameter('textDisplays', {}) as unknown;
+	rows.push(...buildTextDisplayComponents(textDisplaysRaw));
+
+	const separatorsRaw = ctx.getNodeParameter('separators', {}) as unknown;
+	rows.push(...buildSeparatorComponents(separatorsRaw));
+
+	const mediaGalleryRaw = ctx.getNodeParameter('mediaGallery', {}) as unknown;
+	const mediaGallery = buildMediaGalleryComponent(mediaGalleryRaw);
+	if (mediaGallery !== undefined) {
+		rows.push(mediaGallery);
+	}
+
+	const v2FilesRaw = ctx.getNodeParameter('v2Files', {}) as unknown;
+	rows.push(...buildV2FileComponents(v2FilesRaw));
+
 	if (rows.length > 0) {
 		validateComponents(rows);
+		validateV2Components(rows);
 		payload.components = rows as unknown as IDataObject[];
 	}
 
@@ -119,7 +146,12 @@ function buildPayloadFromParameters(ctx: IExecuteSingleFunctions): {
 	}
 
 	const flagsRaw = ctx.getNodeParameter('flags', []) as unknown;
-	const flags = combineFlags(flagsRaw);
+	let flags = combineFlags(flagsRaw);
+	// Auto-OR the IS_COMPONENTS_V2 flag when any v2 layout component is present;
+	// preserves any flags the user explicitly selected.
+	if (rows.length > 0 && hasV2LayoutComponents(rows)) {
+		flags = (flags ?? 0) | DISCORD_MESSAGE_FLAG_IS_COMPONENTS_V2;
+	}
 	if (flags !== undefined) {
 		payload.flags = flags;
 	}
@@ -535,6 +567,38 @@ export const messageFields: INodeProperties[] = [
 		name: 'mentionableSelect',
 	}),
 	createComponentsJsonField({
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: writeOperations,
+			},
+		},
+	}),
+	createTextDisplayField({
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: writeOperations,
+			},
+		},
+	}),
+	createSeparatorComponentField({
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: writeOperations,
+			},
+		},
+	}),
+	createMediaGalleryField({
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: writeOperations,
+			},
+		},
+	}),
+	createV2FileComponentField({
 		displayOptions: {
 			show: {
 				resource: ['message'],

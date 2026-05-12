@@ -219,6 +219,17 @@ const MAX_CUSTOM_ID_LENGTH = 100;
 const MAX_SELECT_PLACEHOLDER_LENGTH = 150;
 const MAX_TEXT_INPUT_LABEL_LENGTH = 45;
 const MAX_TEXT_INPUT_VALUE_LENGTH = 4000;
+const MAX_MEDIA_GALLERY_ITEMS = 10;
+const MAX_TOP_LEVEL_COMPONENTS = 40;
+
+// Discord message flag bit. Required when the payload contains v2 layout
+// components; mixing v1 (content/embeds/classic components) with v2 is rejected.
+export const DISCORD_MESSAGE_FLAG_IS_COMPONENTS_V2 = 32768;
+
+// Section (type 9) and Container (type 17) have nested component arrays whose
+// shapes are too clunky to expose as n8n fixedCollections; users compose those
+// through the raw `components` JSON field instead. Only Text Display, Separator,
+// Media Gallery, and File have guided builders below.
 
 const buttonStyleOptions = [
 	{ name: 'Primary', value: DISCORD_BUTTON_STYLE.PRIMARY },
@@ -1022,5 +1033,380 @@ export function validateComponents(components: DiscordComponent[]): void {
 		if (component.type === DISCORD_COMPONENT_TYPE.ACTION_ROW) {
 			validateActionRow(component);
 		}
+	}
+}
+
+interface RawTextDisplayEntry {
+	content?: string;
+}
+
+interface RawSeparatorEntry {
+	spacing?: number;
+	divider?: boolean;
+}
+
+interface RawMediaGalleryItemEntry {
+	url?: string;
+	description?: string;
+	spoiler?: boolean;
+}
+
+interface RawV2FileEntry {
+	url?: string;
+	spoiler?: boolean;
+}
+
+const separatorSpacingOptions = [
+	{ name: 'Small', value: 1 },
+	{ name: 'Large', value: 2 },
+];
+
+export function createTextDisplayField(
+	overrides: Partial<INodeProperties> = {},
+): INodeProperties {
+	return {
+		displayName: 'Text Displays',
+		name: 'textDisplays',
+		type: 'fixedCollection',
+		typeOptions: {
+			multipleValues: true,
+		},
+		default: {},
+		description: 'V2 Text Display components. Each entry renders as a separate text block; markdown is supported.',
+		options: [
+			{
+				name: 'textDisplay',
+				displayName: 'Text Display',
+				values: [
+					{
+						displayName: 'Content',
+						name: 'content',
+						type: 'string',
+						typeOptions: {
+							rows: 3,
+						},
+						default: '',
+						description: 'Text content of the display. Markdown is supported.',
+					},
+				],
+			},
+		],
+		...overrides,
+	};
+}
+
+export function createSeparatorComponentField(
+	overrides: Partial<INodeProperties> = {},
+): INodeProperties {
+	return {
+		displayName: 'Separators',
+		name: 'separators',
+		type: 'fixedCollection',
+		typeOptions: {
+			multipleValues: true,
+		},
+		default: {},
+		description: 'V2 Separator components used to space or divide other layout components',
+		options: [
+			{
+				name: 'separator',
+				displayName: 'Separator',
+				values: [
+					{
+						displayName: 'Divider',
+						name: 'divider',
+						type: 'boolean',
+						default: true,
+						description: 'Whether to render a visible divider line',
+					},
+					{
+						displayName: 'Spacing',
+						name: 'spacing',
+						type: 'options',
+						default: 1,
+						description: 'Vertical spacing size around the separator',
+						options: separatorSpacingOptions,
+					},
+				],
+			},
+		],
+		...overrides,
+	};
+}
+
+export function createMediaGalleryField(
+	overrides: Partial<INodeProperties> = {},
+): INodeProperties {
+	return {
+		displayName: 'Media Gallery',
+		name: 'mediaGallery',
+		type: 'fixedCollection',
+		default: {},
+		description: `V2 Media Gallery component. Up to ${MAX_MEDIA_GALLERY_ITEMS} media items per gallery.`,
+		options: [
+			{
+				name: 'gallery',
+				displayName: 'Gallery',
+				values: [
+					{
+						displayName: 'Items',
+						name: 'items',
+						type: 'fixedCollection',
+						typeOptions: {
+							multipleValues: true,
+						},
+						default: {},
+						description: `Media items to render. Discord allows up to ${MAX_MEDIA_GALLERY_ITEMS} entries.`,
+						options: [
+							{
+								name: 'item',
+								displayName: 'Item',
+								values: [
+									{
+										displayName: 'Description',
+										name: 'description',
+										type: 'string',
+										default: '',
+										description: 'Optional alt text describing the media',
+									},
+									{
+										displayName: 'Spoiler',
+										name: 'spoiler',
+										type: 'boolean',
+										default: false,
+										description: 'Whether the media is hidden behind a spoiler overlay',
+									},
+									{
+										displayName: 'URL',
+										name: 'url',
+										type: 'string',
+										default: '',
+										description: 'Media URL or attachment://&lt;filename&gt; reference',
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		],
+		...overrides,
+	};
+}
+
+export function createV2FileComponentField(
+	overrides: Partial<INodeProperties> = {},
+): INodeProperties {
+	return {
+		displayName: 'V2 Files',
+		name: 'v2Files',
+		type: 'fixedCollection',
+		typeOptions: {
+			multipleValues: true,
+		},
+		default: {},
+		description: 'V2 File components. Each entry references an uploaded attachment via attachment://&lt;filename&gt;.',
+		options: [
+			{
+				name: 'file',
+				displayName: 'File',
+				values: [
+					{
+						displayName: 'Spoiler',
+						name: 'spoiler',
+						type: 'boolean',
+						default: false,
+						description: 'Whether the file is hidden behind a spoiler overlay',
+					},
+					{
+						displayName: 'URL',
+						name: 'url',
+						type: 'string',
+						default: '',
+						placeholder: 'attachment://example.png',
+						description: 'Attachment URL reference (attachment://&lt;filename&gt;) pointing at an uploaded attachment',
+					},
+				],
+			},
+		],
+		...overrides,
+	};
+}
+
+export function buildTextDisplayComponents(value: IDataObject | unknown): DiscordTextDisplayComponent[] {
+	const entries = readCollectionArray<RawTextDisplayEntry>(value, 'textDisplay');
+	const result: DiscordTextDisplayComponent[] = [];
+	for (const entry of entries) {
+		const content = entry.content?.trim();
+		if (!content) continue;
+		result.push({
+			type: DISCORD_COMPONENT_TYPE.TEXT_DISPLAY,
+			content,
+		});
+	}
+	return result;
+}
+
+export function buildSeparatorComponents(value: IDataObject | unknown): DiscordSeparatorComponent[] {
+	const entries = readCollectionArray<RawSeparatorEntry>(value, 'separator');
+	return entries.map((entry) => {
+		const spacing = entry.spacing === 2 ? 2 : 1;
+		const divider = entry.divider !== false;
+		return {
+			type: DISCORD_COMPONENT_TYPE.SEPARATOR,
+			spacing,
+			divider,
+		};
+	});
+}
+
+export function buildMediaGalleryComponent(
+	value: IDataObject | unknown,
+): DiscordMediaGalleryComponent | undefined {
+	const gallery = readCollectionSingle<{ items?: unknown }>(value, 'gallery');
+	if (!gallery) return undefined;
+
+	const rawItems = readCollectionArray<RawMediaGalleryItemEntry>(gallery.items, 'item');
+	const items: DiscordMediaGalleryItem[] = [];
+	for (const entry of rawItems) {
+		const url = entry.url?.trim();
+		if (!url) continue;
+		const item: DiscordMediaGalleryItem = { media: { url } };
+		const description = entry.description?.trim();
+		if (description) item.description = description;
+		if (entry.spoiler) item.spoiler = true;
+		items.push(item);
+	}
+
+	if (items.length === 0) return undefined;
+	if (items.length > MAX_MEDIA_GALLERY_ITEMS) {
+		throw new Error(`Media galleries allow at most ${MAX_MEDIA_GALLERY_ITEMS} items`);
+	}
+
+	return {
+		type: DISCORD_COMPONENT_TYPE.MEDIA_GALLERY,
+		items,
+	};
+}
+
+export function buildV2FileComponents(value: IDataObject | unknown): DiscordFileComponent[] {
+	const entries = readCollectionArray<RawV2FileEntry>(value, 'file');
+	const result: DiscordFileComponent[] = [];
+	for (const entry of entries) {
+		const url = entry.url?.trim();
+		if (!url) continue;
+		const file: DiscordFileComponent = {
+			type: DISCORD_COMPONENT_TYPE.FILE,
+			file: { url },
+		};
+		if (entry.spoiler) file.spoiler = true;
+		result.push(file);
+	}
+	return result;
+}
+
+const V2_ONLY_TYPES: ReadonlySet<number> = new Set([
+	DISCORD_COMPONENT_TYPE.SECTION,
+	DISCORD_COMPONENT_TYPE.TEXT_DISPLAY,
+	DISCORD_COMPONENT_TYPE.THUMBNAIL,
+	DISCORD_COMPONENT_TYPE.MEDIA_GALLERY,
+	DISCORD_COMPONENT_TYPE.FILE,
+	DISCORD_COMPONENT_TYPE.SEPARATOR,
+	DISCORD_COMPONENT_TYPE.CONTAINER,
+]);
+
+export function hasV2LayoutComponents(components: DiscordComponent[]): boolean {
+	if (!Array.isArray(components)) return false;
+	for (const component of components) {
+		if (!component || typeof component !== 'object') continue;
+		if (V2_ONLY_TYPES.has(component.type)) return true;
+		if (component.type === DISCORD_COMPONENT_TYPE.CONTAINER) {
+			if (hasV2LayoutComponents((component as DiscordContainerComponent).components)) {
+				return true;
+			}
+		}
+		if (component.type === DISCORD_COMPONENT_TYPE.SECTION) {
+			const section = component as DiscordSectionComponent;
+			if (hasV2LayoutComponents(section.components)) return true;
+			if (section.accessory && V2_ONLY_TYPES.has(section.accessory.type)) return true;
+		}
+	}
+	return false;
+}
+
+function validateV2Component(component: DiscordComponent): void {
+	switch (component.type) {
+		case DISCORD_COMPONENT_TYPE.TEXT_DISPLAY: {
+			const text = component as DiscordTextDisplayComponent;
+			if (typeof text.content !== 'string' || text.content.trim() === '') {
+				throw new Error('Text Display components require non-empty content');
+			}
+			break;
+		}
+		case DISCORD_COMPONENT_TYPE.SEPARATOR: {
+			const separator = component as DiscordSeparatorComponent;
+			if (separator.spacing !== undefined && separator.spacing !== 1 && separator.spacing !== 2) {
+				throw new Error('Separator spacing must be 1 (Small) or 2 (Large)');
+			}
+			break;
+		}
+		case DISCORD_COMPONENT_TYPE.MEDIA_GALLERY: {
+			const gallery = component as DiscordMediaGalleryComponent;
+			if (!Array.isArray(gallery.items)) {
+				throw new Error('Media Gallery components require an items array');
+			}
+			if (gallery.items.length > MAX_MEDIA_GALLERY_ITEMS) {
+				throw new Error(`Media galleries allow at most ${MAX_MEDIA_GALLERY_ITEMS} items`);
+			}
+			break;
+		}
+		case DISCORD_COMPONENT_TYPE.CONTAINER: {
+			const container = component as DiscordContainerComponent;
+			if (!Array.isArray(container.components)) {
+				throw new Error('Container components must contain a components array');
+			}
+			for (const child of container.components) {
+				validateV2Component(child);
+			}
+			break;
+		}
+		case DISCORD_COMPONENT_TYPE.SECTION: {
+			const section = component as DiscordSectionComponent;
+			if (!Array.isArray(section.components)) {
+				throw new Error('Section components must contain a components array');
+			}
+			for (const child of section.components) {
+				validateV2Component(child);
+			}
+			break;
+		}
+		case DISCORD_COMPONENT_TYPE.ACTION_ROW: {
+			validateActionRow(component as DiscordActionRowComponent);
+			break;
+		}
+		default:
+			break;
+	}
+}
+
+export function validateV2Components(components: DiscordComponent[]): void {
+	if (!Array.isArray(components)) {
+		throw new Error('Components must be an array');
+	}
+	if (components.length > MAX_TOP_LEVEL_COMPONENTS) {
+		throw new Error(
+			`Discord allows at most ${MAX_TOP_LEVEL_COMPONENTS} top-level components per message`,
+		);
+	}
+
+	const actionRows = components.filter(
+		(component) => component.type === DISCORD_COMPONENT_TYPE.ACTION_ROW,
+	) as DiscordActionRowComponent[];
+	if (actionRows.length > MAX_ACTION_ROWS) {
+		throw new Error(`Discord allows at most ${MAX_ACTION_ROWS} action rows per message`);
+	}
+
+	for (const component of components) {
+		validateV2Component(component);
 	}
 }

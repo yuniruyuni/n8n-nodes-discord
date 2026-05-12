@@ -22,16 +22,27 @@ import {
 	validateEmbeds,
 } from '../shared/embeds';
 import {
+	DISCORD_MESSAGE_FLAG_IS_COMPONENTS_V2,
 	buildButtonsActionRow,
+	buildMediaGalleryComponent,
 	buildMentionableSelectActionRow,
+	buildSeparatorComponents,
 	buildStringSelectActionRow,
+	buildTextDisplayComponents,
 	buildTextInputsActionRow,
+	buildV2FileComponents,
 	createButtonComponentsField,
 	createComponentsJsonField,
+	createMediaGalleryField,
 	createMentionableSelectComponentField,
+	createSeparatorComponentField,
 	createStringSelectComponentField,
+	createTextDisplayField,
 	createTextInputComponentField,
+	createV2FileComponentField,
+	hasV2LayoutComponents,
 	validateComponents,
+	validateV2Components,
 	type DiscordComponent,
 } from '../shared/components';
 import { parseOptionalJsonField, createRawJsonField } from '../shared/messagePayload';
@@ -181,8 +192,24 @@ function buildMessagePayload(
 		rows.push(...(componentsJson as DiscordComponent[]));
 	}
 
+	const textDisplaysRaw = this.getNodeParameter('textDisplays', {}) as unknown;
+	rows.push(...buildTextDisplayComponents(textDisplaysRaw));
+
+	const separatorsRaw = this.getNodeParameter('separators', {}) as unknown;
+	rows.push(...buildSeparatorComponents(separatorsRaw));
+
+	const mediaGalleryRaw = this.getNodeParameter('mediaGallery', {}) as unknown;
+	const mediaGallery = buildMediaGalleryComponent(mediaGalleryRaw);
+	if (mediaGallery !== undefined) {
+		rows.push(mediaGallery);
+	}
+
+	const v2FilesRaw = this.getNodeParameter('v2Files', {}) as unknown;
+	rows.push(...buildV2FileComponents(v2FilesRaw));
+
 	if (rows.length > 0) {
 		validateComponents(rows);
+		validateV2Components(rows);
 		data.components = rows as unknown as IDataObject[];
 	}
 
@@ -194,8 +221,14 @@ function buildMessagePayload(
 	}
 
 	const flags = this.getNodeParameter('flags', 0) as number;
-	if (typeof flags === 'number' && flags > 0) {
-		data.flags = flags;
+	let resolvedFlags = typeof flags === 'number' && flags > 0 ? flags : 0;
+	// Auto-OR the IS_COMPONENTS_V2 flag when v2 layout components are present;
+	// preserves any flag bits the user explicitly set in the Flags field.
+	if (rows.length > 0 && hasV2LayoutComponents(rows)) {
+		resolvedFlags |= DISCORD_MESSAGE_FLAG_IS_COMPONENTS_V2;
+	}
+	if (resolvedFlags > 0) {
+		data.flags = resolvedFlags;
 	}
 
 	if (options.includeTts) {
@@ -695,6 +728,78 @@ export const interactionResponseFields: INodeProperties[] = [
 		name: 'mentionableSelect',
 	}),
 	createComponentsJsonField({
+		displayOptions: {
+			show: {
+				resource: ['interactionResponse'],
+				operation: messageFieldOperations,
+			},
+			hide: {
+				operation: ['createInitialCallback'],
+				responseType: [
+					INTERACTION_CALLBACK_TYPE.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
+					INTERACTION_CALLBACK_TYPE.DEFERRED_UPDATE_MESSAGE,
+					INTERACTION_CALLBACK_TYPE.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT,
+					INTERACTION_CALLBACK_TYPE.MODAL,
+					INTERACTION_CALLBACK_TYPE.LAUNCH_ACTIVITY,
+				],
+			},
+		},
+	}),
+	createTextDisplayField({
+		displayOptions: {
+			show: {
+				resource: ['interactionResponse'],
+				operation: messageFieldOperations,
+			},
+			hide: {
+				operation: ['createInitialCallback'],
+				responseType: [
+					INTERACTION_CALLBACK_TYPE.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
+					INTERACTION_CALLBACK_TYPE.DEFERRED_UPDATE_MESSAGE,
+					INTERACTION_CALLBACK_TYPE.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT,
+					INTERACTION_CALLBACK_TYPE.MODAL,
+					INTERACTION_CALLBACK_TYPE.LAUNCH_ACTIVITY,
+				],
+			},
+		},
+	}),
+	createSeparatorComponentField({
+		displayOptions: {
+			show: {
+				resource: ['interactionResponse'],
+				operation: messageFieldOperations,
+			},
+			hide: {
+				operation: ['createInitialCallback'],
+				responseType: [
+					INTERACTION_CALLBACK_TYPE.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
+					INTERACTION_CALLBACK_TYPE.DEFERRED_UPDATE_MESSAGE,
+					INTERACTION_CALLBACK_TYPE.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT,
+					INTERACTION_CALLBACK_TYPE.MODAL,
+					INTERACTION_CALLBACK_TYPE.LAUNCH_ACTIVITY,
+				],
+			},
+		},
+	}),
+	createMediaGalleryField({
+		displayOptions: {
+			show: {
+				resource: ['interactionResponse'],
+				operation: messageFieldOperations,
+			},
+			hide: {
+				operation: ['createInitialCallback'],
+				responseType: [
+					INTERACTION_CALLBACK_TYPE.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
+					INTERACTION_CALLBACK_TYPE.DEFERRED_UPDATE_MESSAGE,
+					INTERACTION_CALLBACK_TYPE.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT,
+					INTERACTION_CALLBACK_TYPE.MODAL,
+					INTERACTION_CALLBACK_TYPE.LAUNCH_ACTIVITY,
+				],
+			},
+		},
+	}),
+	createV2FileComponentField({
 		displayOptions: {
 			show: {
 				resource: ['interactionResponse'],
