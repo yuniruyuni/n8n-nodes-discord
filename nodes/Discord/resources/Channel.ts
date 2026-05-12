@@ -1,17 +1,63 @@
-import type { INodeProperties } from 'n8n-workflow';
+import type {
+	IDataObject,
+	IExecuteSingleFunctions,
+	IHttpRequestOptions,
+	INodeProperties,
+} from 'n8n-workflow';
 
 import { createAuditLogReasonField } from '../shared/auditLog';
 import { createRawJsonField } from '../shared/messagePayload';
+import {
+	aggregateDiscordPermissions,
+	createPermissionMultiOptionsField,
+} from '../shared/permissions';
 import { DISCORD_SNOWFLAKE_PATTERN } from '../shared/snowflake';
+
+// preSend for editChannelPermissions: assembles the body from either the raw
+// bitfield strings (advanced escape hatch) or the guided multiOptions flags.
+// The raw string fields take precedence over the guided flag selections.
+export async function presendEditChannelPermissions(
+	this: IExecuteSingleFunctions,
+	requestOptions: IHttpRequestOptions,
+): Promise<IHttpRequestOptions> {
+	const allowString = (this.getNodeParameter('permissionAllow', '') as string).trim();
+	const denyString = (this.getNodeParameter('permissionDeny', '') as string).trim();
+	const allowFlags = this.getNodeParameter('allowFlags', []) as string[];
+	const denyFlags = this.getNodeParameter('denyFlags', []) as string[];
+	const permissionType = this.getNodeParameter('permissionType', 0) as number | string;
+
+	const body: IDataObject = {
+		type: Number(permissionType),
+	};
+
+	if (allowString !== '') {
+		body.allow = allowString;
+	} else if (Array.isArray(allowFlags) && allowFlags.length > 0) {
+		body.allow = aggregateDiscordPermissions(allowFlags);
+	}
+
+	if (denyString !== '') {
+		body.deny = denyString;
+	} else if (Array.isArray(denyFlags) && denyFlags.length > 0) {
+		body.deny = aggregateDiscordPermissions(denyFlags);
+	}
+
+	const headers = { ...(requestOptions.headers ?? {}) };
+	(headers as Record<string, string>)['Content-Type'] = 'application/json';
+
+	return {
+		...requestOptions,
+		body,
+		json: true,
+		headers,
+	};
+}
 
 const channelBody =
 	'={{ { ...($parameter.name !== "" ? { name: $parameter.name } : {}), ...($parameter.topic !== "" ? { topic: $parameter.topic } : {}), ...($parameter.position !== "" ? { position: Number($parameter.position) } : {}), ...($parameter.parentId !== "" ? { parent_id: $parameter.parentId } : {}), ...JSON.parse($parameter.rawJson || "{}") } }}';
 
 const bulkDeleteBody =
 	'={{ { messages: JSON.parse($parameter.bulkDeleteMessageIds || "[]") } }}';
-
-const editPermissionsBody =
-	'={{ { ...($parameter.permissionAllow !== "" ? { allow: $parameter.permissionAllow } : {}), ...($parameter.permissionDeny !== "" ? { deny: $parameter.permissionDeny } : {}), type: Number($parameter.permissionType) } }}';
 
 const createInviteBody =
 	'={{ { ...($parameter.inviteMaxAge !== "" ? { max_age: Number($parameter.inviteMaxAge) } : {}), ...($parameter.inviteMaxUses !== "" ? { max_uses: Number($parameter.inviteMaxUses) } : {}), ...($parameter.inviteTemporary !== "" ? { temporary: $parameter.inviteTemporary } : {}), ...($parameter.inviteUnique !== "" ? { unique: $parameter.inviteUnique } : {}), ...($parameter.inviteTargetType !== "" ? { target_type: Number($parameter.inviteTargetType) } : {}), ...($parameter.inviteTargetUserId !== "" ? { target_user_id: $parameter.inviteTargetUserId } : {}), ...($parameter.inviteTargetApplicationId !== "" ? { target_application_id: $parameter.inviteTargetApplicationId } : {}) } }}';
@@ -305,10 +351,12 @@ export const channelOperations: INodeProperties[] = [
 				value: 'editChannelPermissions',
 				action: 'Edit channel permission overwrites',
 				routing: {
+					send: {
+						preSend: [presendEditChannelPermissions],
+					},
 					request: {
 						method: 'PUT',
 						url: '=/channels/{{$parameter.channelId}}/permissions/{{$parameter.overwriteId}}',
-						body: editPermissionsBody,
 					},
 					output: {
 						postReceive: [
@@ -871,6 +919,26 @@ export const channelFields: INodeProperties[] = [
 		},
 		description: 'Snowflake ID of the role or member to update permissions for',
 	},
+	createPermissionMultiOptionsField('Allow Permissions', 'allowFlags', {
+		displayOptions: {
+			show: {
+				resource: ['channel'],
+				operation: ['editChannelPermissions'],
+			},
+		},
+		description:
+			'Permission flags to grant. Ignored if the Allow bitfield string below is set.',
+	}),
+	createPermissionMultiOptionsField('Deny Permissions', 'denyFlags', {
+		displayOptions: {
+			show: {
+				resource: ['channel'],
+				operation: ['editChannelPermissions'],
+			},
+		},
+		description:
+			'Permission flags to deny. Ignored if the Deny bitfield string below is set.',
+	}),
 	{
 		displayName: 'Allow',
 		name: 'permissionAllow',
@@ -882,7 +950,8 @@ export const channelFields: INodeProperties[] = [
 				operation: ['editChannelPermissions'],
 			},
 		},
-		description: 'Bitwise value of all allowed permissions, as a string (Discord permission bitfield)',
+		description:
+			'Bitwise value of all allowed permissions, as a string (Discord permission bitfield). When set, overrides the Allow Permissions flags above.',
 	},
 	{
 		displayName: 'Deny',
@@ -895,7 +964,8 @@ export const channelFields: INodeProperties[] = [
 				operation: ['editChannelPermissions'],
 			},
 		},
-		description: 'Bitwise value of all denied permissions, as a string (Discord permission bitfield)',
+		description:
+			'Bitwise value of all denied permissions, as a string (Discord permission bitfield). When set, overrides the Deny Permissions flags above.',
 	},
 	{
 		displayName: 'Type',

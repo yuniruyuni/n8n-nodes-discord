@@ -14,8 +14,14 @@ Message, Webhook, and InteractionResponse support guided builders for embeds, at
 
 ## Triggers
 
-- `Discord Trigger` — Gateway connection over WebSocket. Identify, heartbeat, resume, reconnect, session persistence. Event selector across the full Discord Gateway event catalog with privileged intent metadata.
+- `Discord Trigger` — Gateway connection over WebSocket. Identify, heartbeat, resume, reconnect, session persistence. Event selector across the full Discord Gateway event catalog with privileged intent metadata. Carries a `Connection Name` used by `Discord Gateway Command`.
 - `Discord HTTP Interaction Trigger` — receives Discord application interactions via HTTPS webhook with Ed25519 signature verification and automatic PING/PONG handling.
+- `Discord Webhook Event Trigger` — receives Discord Application Webhook Events (APPLICATION_AUTHORIZED, ENTITLEMENT_CREATE, etc.) via HTTPS webhook with Ed25519 signature verification and event-type filtering.
+
+## Action helpers
+
+- `Discord Gateway Command` — sends Gateway commands (Update Presence, Update Voice State, Request Guild Members, Request Soundboard Sounds) through an active `Discord Trigger` connection.
+- `Discord OAuth2` — pure-compute helper that builds bot install URLs, OAuth2 authorize URLs, and the token revocation URL.
 
 ## Credentials
 

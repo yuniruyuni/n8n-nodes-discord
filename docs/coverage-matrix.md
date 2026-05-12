@@ -19,7 +19,7 @@ Status legend:
 | Application Resource | Current | Get current application, edit current application (collection of optional body fields), get activity instance | Guided UI for nested fields (install_params/integration_types_config) | Keep app management separate from OAuth2 setup docs. |
 | Application Role Connection Metadata | Current | Get and update metadata records via raw JSON array body | Guided record builder | Needed for linked roles and user-authorized flows. |
 | Audit Logs Resource | Current | Get guild audit log with 69 action_type options and before/after pagination | Cursor helper UX | Audit-log reason headers are handled by `shared/auditLog.ts`. |
-| Auto Moderation | Current | Rule CRUD with raw JSON trigger_metadata / actions and comma-separated exempt arrays | Guided trigger metadata and action builders | Trigger metadata varies by trigger_type; raw JSON keeps surface compact. |
+| Auto Moderation | Current | Rule CRUD with guided trigger_metadata (per trigger_type), guided actions collection, comma-separated exempt arrays; raw JSON escape hatches preserved | None planned | Trigger metadata varies by trigger_type; guided UI gates fields accordingly. |
 | Channels Resource | Current | Get/modify/delete channel; messages, reactions, pins, channel permissions, channel invites, group DM recipients, follow announcement, typing, full thread create/join/member/archive listings | Forum/media channel polish (applied_tags helper) | Message ops also mirrored in Message resource for ergonomics. |
 | Emoji Resource | Current | Guild and application emoji CRUD using data-URI image input | Binary→data-URI helper | No multipart needed for Discord emoji. |
 | Entitlement Resource | Current | List (filters collection), get, consume, create test, delete test | None planned | Monetization milestone complete at REST level. |
@@ -44,7 +44,7 @@ Status legend:
 | Area | Status | Current implementation | Planned next coverage | Boundary notes |
 | --- | --- | --- | --- | --- |
 | Gateway connection | Current | Fetch gateway URL, connect, identify, heartbeat, resume, reconnect, close, session state persistence; close-code mapping helper exposed (`closeCodes.ts`) | Shard options, presence options, integration tests | Protocol mechanics stay internal unless useful as workflow controls. |
-| Gateway send events | Current partial | Identify, Resume, Heartbeat are internal | Request Guild Members, Request Soundboard Sounds, Update Presence, Update Voice State as user-callable controls | Voice state update may be REST-only; full voice media is boundary. |
+| Gateway send events | Current | Identify, Resume, Heartbeat are internal; `Discord Gateway Command` action node exposes Update Presence (op 3), Update Voice State (op 4), Request Guild Members (op 8), Request Soundboard Sounds (op 31) via the active Trigger's connection | None planned | Voice state update may be REST-only; full voice media is boundary. |
 | Core session events | Current | `READY`, `RESUMED`, `RECONNECT`, `INVALID_SESSION`, `RATE_LIMITED`, raw payload option, and any-event option | Diagnostics normalization | `HELLO` remains internal protocol handling. |
 | Application command events | Current | `APPLICATION_COMMAND_PERMISSIONS_UPDATE` selectable with metadata | Payload normalization | |
 | Auto moderation events | Current | Rule create/update/delete and action execution selectable with metadata | Payload normalization | |
@@ -55,13 +55,13 @@ Status legend:
 | Integration/invite/message/reaction/poll events | Current | All selectable with metadata; MESSAGE_CONTENT privileged warning on message events | Payload normalization | |
 | Interaction events | Current | `INTERACTION_CREATE` selectable; HTTP interaction trigger exists alongside Gateway path | Per-type normalization in trigger output | |
 | Presence/typing/user/voice/stage/soundboard/subscription events | Current | Selectors, intent mapping, and privileged metadata on PRESENCE_UPDATE | Payload normalization and boundary docs | |
-| Webhook Events over HTTP | Planned | None | Review event registration, verification, trigger shape, duplicate handling | Could become an additional trigger on top of `Discord HTTP Interaction Trigger`. |
+| Webhook Events over HTTP | Current | `Discord Webhook Event Trigger` receives Application Webhook Events with Ed25519 verification, PING handling, and an event-type filter | None planned | Reuses the same credential as HTTP interactions. |
 
 ## Interactions and Components
 
 | Area | Status | Current implementation | Planned next coverage | Boundary notes |
 | --- | --- | --- | --- | --- |
-| Application Commands | Current | Global/guild list/create/get/edit/delete/bulk overwrite, guild command permissions get/update; localization, contexts, integration types, default_member_permissions, dm_permission, nsfw, command type; raw JSON payload as escape hatch | Guided slash/user/message option builders for the `options` array | |
+| Application Commands | Current | Global/guild list/create/get/edit/delete/bulk overwrite, guild command permissions get/update; localization (guided per-locale collection + raw JSON), contexts, integration types, default_member_permissions (guided multi-select + raw bitfield), dm_permission, nsfw, command type; guided `commandOptions` collection per Discord option type with min/max/choices/autocomplete/channel_types; raw JSON payload as escape hatch | None planned (nested sub-command/group options remain raw JSON) | |
 | Receiving Interactions | Current | Gateway selector receives `INTERACTION_CREATE`; HTTP trigger (`DiscordHttpInteractionTrigger`) verifies Ed25519 signatures, auto-handles PING, emits other types | Per-type payload normalization | HTTP verification uses `DiscordInteractionApi`. |
 | Responding to Interactions | Current | Initial callback (types 4, 5, 6, 7, 8, 9, 12 with guided UI), original response get/edit/delete, followup create/get/edit/delete; guided embeds/components/attachments/allowed_mentions; multipart preSend | None planned | |
 | Components | Current | Type union for all v2 components; guided UI builders for buttons (action row), string select, mentionable/user/role/channel select, modal text input; action-row transformers; validators (max 5 rows, max 25 select options, etc.) | Section/Container/MediaGallery layout builders | |
@@ -71,8 +71,8 @@ Status legend:
 
 | Area | Status | Current implementation | Planned next coverage | Boundary notes |
 | --- | --- | --- | --- | --- |
-| OAuth2 | Current | OAuth2 credential with authorization/token URLs, scopes, refresh; `shared/oauth2.ts` with 33-scope option list, bot install URL builder, authorize URL builder, token revocation URL | Per-op credential selection in operations, install URL exposed as a Discord-node operation | User-token/self-bot automation remains unsupported. |
-| Permissions | Current | Permission constants, options, aggregation, checks; `default_member_permissions` field wired on application commands | Channel overwrite UI helper, guided permission selector for command default permissions | Values aligned with official Permissions topic. |
+| OAuth2 | Current | OAuth2 credential with authorization/token URLs, scopes, refresh; `Discord OAuth2` node exposes bot install URL builder, authorize URL builder, token revocation URL as workflow operations; `shared/oauth2.ts` with 33-scope option list | Per-op credential selection on the Discord REST node | User-token/self-bot automation remains unsupported. |
+| Permissions | Current | Permission constants, options, aggregation, checks; guided `defaultMemberPermissionsFlags` on application commands; guided `allowFlags`/`denyFlags` on Channel `editChannelPermissions`; raw bitfield strings preserved as escape hatches | None planned | Values aligned with official Permissions topic. |
 | Rate Limits | Current partial | `shared/rateLimits.ts` parsers and helpers; n8n HTTP retry remains the runtime behavior | Optional custom retry on top of parsers if n8n's default proves insufficient | Custom throttling avoided unless required. |
 | Opcodes and Status Codes | Current | Gateway opcode handling; close-code map (`closeCodes.ts`) covering 4000-4014 with reconnect flag | Wire close-code metadata into trigger diagnostics output | Mostly internal protocol support. |
 | Threads | Current | Covered through Channel resource (create from message / without message / in forum, join, member ops, archived listings) | None planned | Dedicated Thread resource not needed. |

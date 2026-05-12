@@ -6,6 +6,8 @@ import type {
 
 import { createAuditLogReasonField } from '../shared/auditLog';
 
+// Sticker uploads use multipart/form-data (not the data URI helper in shared/dataUri).
+
 // Discord requires multipart/form-data for sticker uploads (the file part cannot
 // be expressed in JSON). Declarative routing cannot reach the item's binary
 // buffer on its own, so a preSend hook reads the configured binary property,

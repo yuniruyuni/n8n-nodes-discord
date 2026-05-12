@@ -1,6 +1,33 @@
-import type { INodeProperties } from 'n8n-workflow';
+import type {
+	IDataObject,
+	IExecuteSingleFunctions,
+	IHttpRequestOptions,
+	INodeProperties,
+} from 'n8n-workflow';
 
 import { createAuditLogReasonField } from '../shared/auditLog';
+import { resolveDataUriFromBinary } from '../shared/dataUri';
+
+export async function presendEmojiImage(
+	this: IExecuteSingleFunctions,
+	requestOptions: IHttpRequestOptions,
+): Promise<IHttpRequestOptions> {
+	const binaryParam = this.getNodeParameter('binaryPropertyName', '') as unknown;
+	const binaryPropertyName = typeof binaryParam === 'string' ? binaryParam.trim() : '';
+	if (binaryPropertyName === '') {
+		return requestOptions;
+	}
+
+	const dataUri = await resolveDataUriFromBinary(this, this.getItemIndex(), binaryPropertyName);
+	const body =
+		requestOptions.body && typeof requestOptions.body === 'object'
+			? (requestOptions.body as IDataObject)
+			: {};
+	return {
+		...requestOptions,
+		body: { ...body, image: dataUri },
+	};
+}
 
 const guildEmojiCreateBody =
 	'={{ { ...($parameter.name !== "" ? { name: $parameter.name } : {}), ...($parameter.image !== "" ? { image: $parameter.image } : {}), ...($parameter.roles !== "" ? { roles: $parameter.roles.split(",").map(role => role.trim()).filter(Boolean) } : {}), ...JSON.parse($parameter.rawJson || "{}") } }}';
@@ -53,6 +80,9 @@ export const emojiOperations: INodeProperties[] = [
 				value: 'createGuildEmoji',
 				action: 'Create a guild emoji',
 				routing: {
+					send: {
+						preSend: [presendEmojiImage],
+					},
 					request: {
 						method: 'POST',
 						url: '=/guilds/{{$parameter.guildId}}/emojis',
@@ -120,6 +150,9 @@ export const emojiOperations: INodeProperties[] = [
 				value: 'createApplicationEmoji',
 				action: 'Create an application emoji',
 				routing: {
+					send: {
+						preSend: [presendEmojiImage],
+					},
 					request: {
 						method: 'POST',
 						url: '=/applications/{{$parameter.applicationId}}/emojis',
@@ -257,7 +290,21 @@ export const emojiFields: INodeProperties[] = [
 			},
 		},
 		description:
-			'Image as a base64 data URI string (e.g., data:image/png;base64,...). Discord supports PNG, JPEG, and GIF up to 256 KiB.',
+			'Image as a base64 data URI string (e.g., data:image/png;base64,...) or an http(s) URL. Discord supports PNG, JPEG, and GIF up to 256 KiB. Ignored when Binary Property is set.',
+	},
+	{
+		displayName: 'Binary Property',
+		name: 'binaryPropertyName',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['emoji'],
+				operation: ['createGuildEmoji', 'createApplicationEmoji'],
+			},
+		},
+		description:
+			'Name of the input item binary property holding the emoji image. When set, it is converted to a data URI and overrides the Image field.',
 	},
 	{
 		displayName: 'Role IDs',

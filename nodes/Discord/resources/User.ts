@@ -1,6 +1,45 @@
-import type { INodeProperties } from 'n8n-workflow';
+import type {
+	IDataObject,
+	IExecuteSingleFunctions,
+	IHttpRequestOptions,
+	INodeProperties,
+} from 'n8n-workflow';
 
+import { resolveDataUriFromBinary } from '../shared/dataUri';
 import { createRawJsonField } from '../shared/messagePayload';
+
+export async function presendUserModifyCurrent(
+	this: IExecuteSingleFunctions,
+	requestOptions: IHttpRequestOptions,
+): Promise<IHttpRequestOptions> {
+	const avatarBinaryParam = this.getNodeParameter('avatarBinaryPropertyName', '') as unknown;
+	const avatarBinary =
+		typeof avatarBinaryParam === 'string' ? avatarBinaryParam.trim() : '';
+	const bannerBinaryParam = this.getNodeParameter('bannerBinaryPropertyName', '') as unknown;
+	const bannerBinary =
+		typeof bannerBinaryParam === 'string' ? bannerBinaryParam.trim() : '';
+
+	if (avatarBinary === '' && bannerBinary === '') {
+		return requestOptions;
+	}
+
+	const body =
+		requestOptions.body && typeof requestOptions.body === 'object'
+			? { ...(requestOptions.body as IDataObject) }
+			: {};
+
+	if (avatarBinary !== '') {
+		body.avatar = await resolveDataUriFromBinary(this, this.getItemIndex(), avatarBinary);
+	}
+	if (bannerBinary !== '') {
+		body.banner = await resolveDataUriFromBinary(this, this.getItemIndex(), bannerBinary);
+	}
+
+	return {
+		...requestOptions,
+		body,
+	};
+}
 
 const modifyCurrentBody =
 	'={{ { ...($parameter.username !== "" ? { username: $parameter.username } : {}), ...($parameter.avatar !== "" ? { avatar: $parameter.avatar === "null" ? null : $parameter.avatar } : {}), ...($parameter.banner !== "" ? { banner: $parameter.banner === "null" ? null : $parameter.banner } : {}) } }}';
@@ -52,6 +91,9 @@ export const userOperations: INodeProperties[] = [
 				value: 'modifyCurrent',
 				action: 'Modify the current user',
 				routing: {
+					send: {
+						preSend: [presendUserModifyCurrent],
+					},
 					request: {
 						method: 'PATCH',
 						url: '/users/@me',
@@ -240,7 +282,21 @@ export const userFields: INodeProperties[] = [
 			},
 		},
 		description:
-			'Avatar image as a data URI (e.g. data:image/png;base64,...) or the literal string "null" to remove the existing avatar',
+			'Avatar image as a data URI (e.g. data:image/png;base64,...) or the literal string "null" to remove the existing avatar. Ignored when Avatar Binary Property is set.',
+	},
+	{
+		displayName: 'Avatar Binary Property',
+		name: 'avatarBinaryPropertyName',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['user'],
+				operation: ['modifyCurrent'],
+			},
+		},
+		description:
+			'Name of the input item binary property holding the avatar image. When set, it is converted to a data URI and overrides the Avatar field.',
 	},
 	{
 		displayName: 'Banner',
@@ -254,7 +310,21 @@ export const userFields: INodeProperties[] = [
 			},
 		},
 		description:
-			'Banner image as a data URI (e.g. data:image/png;base64,...) or the literal string "null" to remove the existing banner',
+			'Banner image as a data URI (e.g. data:image/png;base64,...) or the literal string "null" to remove the existing banner. Ignored when Banner Binary Property is set.',
+	},
+	{
+		displayName: 'Banner Binary Property',
+		name: 'bannerBinaryPropertyName',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['user'],
+				operation: ['modifyCurrent'],
+			},
+		},
+		description:
+			'Name of the input item binary property holding the banner image. When set, it is converted to a data URI and overrides the Banner field.',
 	},
 	{
 		displayName: 'Before',

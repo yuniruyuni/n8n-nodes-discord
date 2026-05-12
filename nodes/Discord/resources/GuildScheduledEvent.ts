@@ -1,7 +1,34 @@
-import type { INodeProperties } from 'n8n-workflow';
+import type {
+	IDataObject,
+	IExecuteSingleFunctions,
+	IHttpRequestOptions,
+	INodeProperties,
+} from 'n8n-workflow';
 
 import { createAuditLogReasonField } from '../shared/auditLog';
+import { resolveDataUriFromBinary } from '../shared/dataUri';
 import { createRawJsonField } from '../shared/messagePayload';
+
+export async function presendGuildScheduledEventImage(
+	this: IExecuteSingleFunctions,
+	requestOptions: IHttpRequestOptions,
+): Promise<IHttpRequestOptions> {
+	const binaryParam = this.getNodeParameter('binaryPropertyName', '') as unknown;
+	const binaryPropertyName = typeof binaryParam === 'string' ? binaryParam.trim() : '';
+	if (binaryPropertyName === '') {
+		return requestOptions;
+	}
+
+	const dataUri = await resolveDataUriFromBinary(this, this.getItemIndex(), binaryPropertyName);
+	const body =
+		requestOptions.body && typeof requestOptions.body === 'object'
+			? (requestOptions.body as IDataObject)
+			: {};
+	return {
+		...requestOptions,
+		body: { ...body, image: dataUri },
+	};
+}
 
 const createBody =
 	'={{ { ...($parameter.channelId !== "" ? { channel_id: $parameter.channelId } : {}), ...($parameter.entityMetadata ? { entity_metadata: JSON.parse($parameter.entityMetadata) } : {}), name: $parameter.name, privacy_level: $parameter.privacyLevel, scheduled_start_time: $parameter.scheduledStartTime, ...($parameter.scheduledEndTime !== "" ? { scheduled_end_time: $parameter.scheduledEndTime } : {}), ...($parameter.description !== "" ? { description: $parameter.description } : {}), entity_type: $parameter.entityType, ...($parameter.image !== "" ? { image: $parameter.image } : {}), ...($parameter.recurrenceRule ? { recurrence_rule: JSON.parse($parameter.recurrenceRule) } : {}), ...JSON.parse($parameter.rawJson || "{}") } }}';
@@ -37,6 +64,9 @@ export const guildScheduledEventOperations: INodeProperties[] = [
 				value: 'create',
 				action: 'Create a guild scheduled event',
 				routing: {
+					send: {
+						preSend: [presendGuildScheduledEventImage],
+					},
 					request: {
 						method: 'POST',
 						url: '=/guilds/{{$parameter.guildId}}/scheduled-events',
@@ -60,6 +90,9 @@ export const guildScheduledEventOperations: INodeProperties[] = [
 				value: 'modify',
 				action: 'Modify a guild scheduled event',
 				routing: {
+					send: {
+						preSend: [presendGuildScheduledEventImage],
+					},
 					request: {
 						method: 'PATCH',
 						url: '=/guilds/{{$parameter.guildId}}/scheduled-events/{{$parameter.eventId}}',
@@ -377,7 +410,21 @@ export const guildScheduledEventFields: INodeProperties[] = [
 			},
 		},
 		description:
-			'Cover image as a base64 data URI string (e.g., data:image/png;base64,...)',
+			'Cover image as a base64 data URI string (e.g., data:image/png;base64,...). Ignored when Binary Property is set.',
+	},
+	{
+		displayName: 'Binary Property',
+		name: 'binaryPropertyName',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['guildScheduledEvent'],
+				operation: ['create', 'modify'],
+			},
+		},
+		description:
+			'Name of the input item binary property holding the cover image. When set, it is converted to a data URI and overrides the Image field.',
 	},
 	createRawJsonField(
 		'Recurrence Rule',

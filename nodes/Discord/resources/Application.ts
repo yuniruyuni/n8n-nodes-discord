@@ -1,4 +1,43 @@
-import type { INodeProperties } from 'n8n-workflow';
+import type {
+	IDataObject,
+	IExecuteSingleFunctions,
+	IHttpRequestOptions,
+	INodeProperties,
+} from 'n8n-workflow';
+
+import { resolveDataUriFromBinary } from '../shared/dataUri';
+
+export async function presendApplicationEditCurrent(
+	this: IExecuteSingleFunctions,
+	requestOptions: IHttpRequestOptions,
+): Promise<IHttpRequestOptions> {
+	const updateFieldsValue = this.getNodeParameter('updateFields', {}) as IDataObject;
+	const iconBinaryRaw = updateFieldsValue.iconBinaryPropertyName;
+	const coverBinaryRaw = updateFieldsValue.coverImageBinaryPropertyName;
+	const iconBinary = typeof iconBinaryRaw === 'string' ? iconBinaryRaw.trim() : '';
+	const coverBinary = typeof coverBinaryRaw === 'string' ? coverBinaryRaw.trim() : '';
+
+	if (iconBinary === '' && coverBinary === '') {
+		return requestOptions;
+	}
+
+	const body =
+		requestOptions.body && typeof requestOptions.body === 'object'
+			? { ...(requestOptions.body as IDataObject) }
+			: {};
+
+	if (iconBinary !== '') {
+		body.icon = await resolveDataUriFromBinary(this, this.getItemIndex(), iconBinary);
+	}
+	if (coverBinary !== '') {
+		body.cover_image = await resolveDataUriFromBinary(this, this.getItemIndex(), coverBinary);
+	}
+
+	return {
+		...requestOptions,
+		body,
+	};
+}
 
 export const applicationOperations: INodeProperties[] = [
 	{
@@ -28,6 +67,9 @@ export const applicationOperations: INodeProperties[] = [
 				value: 'editCurrent',
 				action: 'Edit the current application',
 				routing: {
+					send: {
+						preSend: [presendApplicationEditCurrent],
+					},
 					request: {
 						method: 'PATCH',
 						url: '/applications/@me',
@@ -98,13 +140,22 @@ export const applicationFields: INodeProperties[] = [
 				type: 'string',
 				default: '',
 				placeholder: 'data:image/png;base64,...',
-				description: 'Default rich presence invite cover image as a Discord image data URI',
+				description:
+					'Default rich presence invite cover image as a Discord image data URI. Ignored when Cover Image Binary Property is set.',
 				routing: {
 					send: {
 						type: 'body',
 						property: 'cover_image',
 					},
 				},
+			},
+			{
+				displayName: 'Cover Image Binary Property',
+				name: 'coverImageBinaryPropertyName',
+				type: 'string',
+				default: '',
+				description:
+					'Name of the input item binary property holding the cover image. When set, it is converted to a data URI and overrides the Cover Image field.',
 			},
 			{
 				displayName: 'Custom Install URL',
@@ -195,13 +246,22 @@ export const applicationFields: INodeProperties[] = [
 				type: 'string',
 				default: '',
 				placeholder: 'data:image/png;base64,...',
-				description: 'Application icon as a Discord image data URI',
+				description:
+					'Application icon as a Discord image data URI. Ignored when Icon Binary Property is set.',
 				routing: {
 					send: {
 						type: 'body',
 						property: 'icon',
 					},
 				},
+			},
+			{
+				displayName: 'Icon Binary Property',
+				name: 'iconBinaryPropertyName',
+				type: 'string',
+				default: '',
+				description:
+					'Name of the input item binary property holding the application icon. When set, it is converted to a data URI and overrides the Icon field.',
 			},
 			{
 				displayName: 'Install Params (JSON)',

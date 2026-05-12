@@ -1,6 +1,33 @@
-import type { INodeProperties } from 'n8n-workflow';
+import type {
+	IDataObject,
+	IExecuteSingleFunctions,
+	IHttpRequestOptions,
+	INodeProperties,
+} from 'n8n-workflow';
 
 import { createAuditLogReasonField } from '../shared/auditLog';
+import { resolveDataUriFromBinary } from '../shared/dataUri';
+
+export async function presendSoundboardSound(
+	this: IExecuteSingleFunctions,
+	requestOptions: IHttpRequestOptions,
+): Promise<IHttpRequestOptions> {
+	const binaryParam = this.getNodeParameter('binaryPropertyName', '') as unknown;
+	const binaryPropertyName = typeof binaryParam === 'string' ? binaryParam.trim() : '';
+	if (binaryPropertyName === '') {
+		return requestOptions;
+	}
+
+	const dataUri = await resolveDataUriFromBinary(this, this.getItemIndex(), binaryPropertyName);
+	const body =
+		requestOptions.body && typeof requestOptions.body === 'object'
+			? (requestOptions.body as IDataObject)
+			: {};
+	return {
+		...requestOptions,
+		body: { ...body, sound: dataUri },
+	};
+}
 
 const sendSoundBody =
 	'={{ { ...($parameter.soundId !== "" ? { sound_id: $parameter.soundId } : {}), ...($parameter.sourceGuildId !== "" ? { source_guild_id: $parameter.sourceGuildId } : {}), ...JSON.parse($parameter.rawJson || "{}") } }}';
@@ -73,6 +100,9 @@ export const soundboardOperations: INodeProperties[] = [
 				value: 'createGuildSound',
 				action: 'Create a guild soundboard sound',
 				routing: {
+					send: {
+						preSend: [presendSoundboardSound],
+					},
 					request: {
 						method: 'POST',
 						url: '=/guilds/{{$parameter.guildId}}/soundboard-sounds',
@@ -206,7 +236,21 @@ export const soundboardFields: INodeProperties[] = [
 			},
 		},
 		description:
-			'Audio file as a base64 data URI string (e.g., data:audio/mpeg;base64,... or data:audio/ogg;base64,...). Discord supports MP3 and OGG up to 512 KiB and 5.2 seconds.',
+			'Audio file as a base64 data URI string (e.g., data:audio/mpeg;base64,... or data:audio/ogg;base64,...). Discord supports MP3 and OGG up to 512 KiB and 5.2 seconds. Ignored when Binary Property is set.',
+	},
+	{
+		displayName: 'Binary Property',
+		name: 'binaryPropertyName',
+		type: 'string',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['soundboard'],
+				operation: ['createGuildSound'],
+			},
+		},
+		description:
+			'Name of the input item binary property holding the audio file. When set, it is converted to a data URI and overrides the Sound field.',
 	},
 	{
 		displayName: 'Volume',

@@ -14,8 +14,14 @@ Message、Webhook、InteractionResponse は embeds、attachments（multipart ア
 
 ## Trigger
 
-- `Discord Trigger` — WebSocket 経由の Gateway 接続。Identify、heartbeat、resume、reconnect、session 永続化をサポート。全 Gateway イベントカタログから選択でき、privileged intent のメタデータも付与されています。
+- `Discord Trigger` — WebSocket 経由の Gateway 接続。Identify、heartbeat、resume、reconnect、session 永続化をサポート。全 Gateway イベントカタログから選択でき、privileged intent のメタデータも付与されています。`Connection Name` で `Discord Gateway Command` から参照可能。
 - `Discord HTTP Interaction Trigger` — HTTPS 経由で Discord application interaction を受信。Ed25519 署名検証と PING/PONG の自動応答を内蔵。
+- `Discord Webhook Event Trigger` — Discord Application Webhook Events（APPLICATION_AUTHORIZED、ENTITLEMENT_CREATE 等）を HTTPS で受信。Ed25519 署名検証とイベント型フィルター付き。
+
+## アクション補助ノード
+
+- `Discord Gateway Command` — 起動中の `Discord Trigger` の接続を経由して Gateway コマンド（Update Presence、Update Voice State、Request Guild Members、Request Soundboard Sounds）を送信。
+- `Discord OAuth2` — Bot install URL、OAuth2 authorize URL、トークン revocation URL を生成する純計算ノード。
 
 ## Credentials
 
