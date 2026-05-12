@@ -115,8 +115,11 @@
   `docs/coverage-matrix.md`.
 - Build / lint / 89 tests clean under `n8n-node build`,
   `n8n-node lint`, and `npm test`.
-- `eslint.config.mjs` ignores `tests/`; this triggers an informational
-  strict-mode notice from `n8n-node lint` but exit code stays 0.
+- `n8n.strict` is set to `false` in `package.json` because
+  `eslint.config.mjs` is customized to ignore `tests/` (which use
+  `node:test` / `node:assert`, otherwise blocked by the n8n default
+  community-node eslint preset). With strict mode disabled,
+  `n8n-node lint` exits 0; CI runs lint as part of the matrix.
 - Voice gateway / UDP media transport, RPC, Embedded App SDK, Social
   SDK, Rich Presence are intentionally out of scope.
 
