@@ -1,5 +1,7 @@
 import { ApplicationError, LoggerProxy, sleep, type IDataObject } from 'n8n-workflow';
 
+import { getCloseCodeMeta } from './closeCodes';
+
 const OPCODE_DISPATCH = 0;
 const OPCODE_HEARTBEAT = 1;
 const OPCODE_IDENTIFY = 2;
@@ -41,35 +43,68 @@ export class GatewayWebSocket {
 		const url = `${this.gatewayUrl}?v=10&encoding=json`;
 
 		return new Promise((resolve, reject) => {
+			let settled = false;
+			const settleResolve = (): void => {
+				if (settled) return;
+				settled = true;
+				resolve();
+			};
+			const settleReject = (error: Error): void => {
+				if (settled) return;
+				settled = true;
+				reject(error);
+			};
+
 			try {
 				this.ws = new WebSocket(url);
 
 				this.ws.onmessage = (event: MessageEvent) => {
 					try {
 						const payload = JSON.parse(event.data as string) as IDataObject;
-						this.handlePayload(payload, options, resolve);
+						this.handlePayload(payload, options, settleResolve);
 					} catch (error) {
 						LoggerProxy.error('Failed to handle Discord Gateway payload', {
 							error: error instanceof Error ? error.message : String(error),
 							workflowId: this.workflowId,
 							nodeType: 'n8n-nodes-discord.discordTrigger',
 						});
-						reject(error);
+						settleReject(error instanceof Error ? error : new ApplicationError(String(error)));
 					}
 				};
 
 				this.ws.onerror = () => {
-					reject(new ApplicationError('Discord Gateway WebSocket error occurred'));
+					settleReject(new ApplicationError('Discord Gateway WebSocket error occurred'));
 				};
 
-				this.ws.onclose = () => {
+				this.ws.onclose = (event: CloseEvent) => {
 					this.stopHeartbeat();
-					if (!this.closing) {
-						this.onDisconnect(this.sessionId !== null);
+					const code = event.code;
+					const meta = getCloseCodeMeta(code);
+
+					if (!settled) {
+						// Connection closed before READY arrived — surface a clear error
+						// instead of hanging the trigger awaiting a Promise that never resolves.
+						const reason = meta
+							? `${meta.name}: ${meta.description}`
+							: event.reason || 'connection closed before READY';
+						const hint = meta && !meta.reconnect
+							? ' This close code is non-recoverable; check the bot token, enabled intents, and Developer Portal settings.'
+							: '';
+						settleReject(
+							new ApplicationError(
+								`Discord Gateway closed with code ${code} (${reason}).${hint}`,
+							),
+						);
+						return;
 					}
+
+					if (this.closing) return;
+
+					const canResume = this.sessionId !== null && (meta?.reconnect ?? true);
+					this.onDisconnect(canResume);
 				};
 			} catch (error) {
-				reject(error);
+				settleReject(error instanceof Error ? error : new ApplicationError(String(error)));
 			}
 		});
 	}
