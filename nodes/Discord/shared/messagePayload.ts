@@ -15,7 +15,6 @@ export function parseOptionalJsonField<T>(value: unknown, fieldName: string): T 
 		// Library helper without node context; callers are responsible for
 		// wrapping this in NodeOperationError if needed. SyntaxError preserves
 		// the JSON-parse semantics for callers that re-throw.
-		// eslint-disable-next-line -- rule name omitted on purpose; @n8n/community-nodes/require-node-api-error does not apply to context-less library helpers
 		throw new SyntaxError(`Invalid JSON in ${fieldName}: ${(error as Error).message}`);
 	}
 }
