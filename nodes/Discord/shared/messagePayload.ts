@@ -12,6 +12,9 @@ export function parseOptionalJsonField<T>(value: unknown, fieldName: string): T 
 	try {
 		return JSON.parse(value) as T;
 	} catch (error) {
+		// Library helper without node context; callers are responsible for
+		// wrapping this in NodeOperationError if needed.
+		// eslint-disable-next-line @n8n/community-nodes/require-node-api-error
 		throw new Error(`Invalid JSON in ${fieldName}: ${(error as Error).message}`);
 	}
 }

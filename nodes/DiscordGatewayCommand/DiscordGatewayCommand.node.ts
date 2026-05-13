@@ -276,6 +276,7 @@ export class DiscordGatewayCommand implements INodeType {
 		const returnData: INodeExecutionData[] = [];
 
 		for (let i = 0; i < items.length; i++) {
+			try {
 			const connectionName = (this.getNodeParameter('connectionName', i, 'default') as string) || 'default';
 			const operation = this.getNodeParameter('operation', i) as string;
 
@@ -432,6 +433,17 @@ export class DiscordGatewayCommand implements INodeType {
 				},
 				pairedItem: { item: i },
 			});
+			} catch (error) {
+				if (this.continueOnFail()) {
+					const message = error instanceof Error ? error.message : String(error);
+					returnData.push({
+						json: { error: message },
+						pairedItem: { item: i },
+					});
+					continue;
+				}
+				throw new NodeOperationError(this.getNode(), error as Error, { itemIndex: i });
+			}
 		}
 
 		return [returnData];
