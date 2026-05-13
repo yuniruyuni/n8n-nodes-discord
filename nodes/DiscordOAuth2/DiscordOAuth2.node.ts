@@ -41,16 +41,16 @@ export class DiscordOAuth2 implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'Build Bot Install URL',
-						value: 'buildBotInstallUrl',
-						description: 'Build a URL that adds the bot to a guild',
-						action: 'Build bot install URL',
-					},
-					{
 						name: 'Build Authorize URL',
 						value: 'buildAuthorizeUrl',
 						description: 'Build a user-facing OAuth2 authorization URL',
 						action: 'Build authorize URL',
+					},
+					{
+						name: 'Build Bot Install URL',
+						value: 'buildBotInstallUrl',
+						description: 'Build a URL that adds the bot to a guild',
+						action: 'Build bot install URL',
 					},
 					{
 						name: 'Get Token Revocation URL',
@@ -167,8 +167,8 @@ export class DiscordOAuth2 implements INodeType {
 				type: 'options',
 				options: [
 					{ name: 'Guild Install', value: '0' },
-					{ name: 'User Install', value: '1' },
 					{ name: 'None (Omit)', value: 'none' },
+					{ name: 'User Install', value: '1' },
 				],
 				default: '0',
 				displayOptions: { show: { operation: ['buildAuthorizeUrl'] } },

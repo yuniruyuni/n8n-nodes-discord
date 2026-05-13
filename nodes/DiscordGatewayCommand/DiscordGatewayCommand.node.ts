@@ -55,18 +55,6 @@ export class DiscordGatewayCommand implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'Update Presence',
-						value: 'updatePresence',
-						description: "Set the bot's status and current activity (opcode 3)",
-						action: 'Update presence',
-					},
-					{
-						name: 'Update Voice State',
-						value: 'updateVoiceState',
-						description: 'Join, leave, or move the bot in a voice channel (opcode 4)',
-						action: 'Update voice state',
-					},
-					{
 						name: 'Request Guild Members',
 						value: 'requestGuildMembers',
 						description:
@@ -80,6 +68,18 @@ export class DiscordGatewayCommand implements INodeType {
 							'Request available soundboard sounds in guilds; response arrives as SOUNDBOARD_SOUNDS events (opcode 31)',
 						action: 'Request soundboard sounds',
 					},
+					{
+						name: 'Update Presence',
+						value: 'updatePresence',
+						description: "Set the bot's status and current activity (opcode 3)",
+						action: 'Update presence',
+					},
+					{
+						name: 'Update Voice State',
+						value: 'updateVoiceState',
+						description: 'Join, leave, or move the bot in a voice channel (opcode 4)',
+						action: 'Update voice state',
+					},
 				],
 				default: 'updatePresence',
 			},
@@ -90,10 +90,10 @@ export class DiscordGatewayCommand implements INodeType {
 				name: 'status',
 				type: 'options',
 				options: [
-					{ name: 'Online', value: 'online' },
 					{ name: 'Do Not Disturb', value: 'dnd' },
 					{ name: 'Idle', value: 'idle' },
 					{ name: 'Invisible', value: 'invisible' },
+					{ name: 'Online', value: 'online' },
 				],
 				default: 'online',
 				displayOptions: { show: { operation: ['updatePresence'] } },
