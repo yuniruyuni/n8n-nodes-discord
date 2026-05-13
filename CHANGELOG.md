@@ -100,9 +100,6 @@
 
 #### Tooling
 
-- Node-built-in test runner via `tsx` loader (no other deps). 89 unit
-  tests covering snowflake, pagination, permissions, embeds,
-  components, allowedMentions, attachments, rateLimits, closeCodes.
 - `docs/examples/` with seven workflow walkthroughs plus an index:
   send-message, webhook-execute, gateway-trigger-message-create,
   slash-command-with-response, http-interactions-setup,
@@ -113,13 +110,18 @@
 - All REST resource pages from the official Discord docs index are
   now represented at usable depth. Coverage detail lives in
   `docs/coverage-matrix.md`.
-- Build / lint / 89 tests clean under `n8n-node build`,
-  `n8n-node lint`, and `npm test`.
-- `n8n.strict` is set to `false` in `package.json` because
-  `eslint.config.mjs` is customized to ignore `tests/` (which use
-  `node:test` / `node:assert`, otherwise blocked by the n8n default
-  community-node eslint preset). With strict mode disabled,
-  `n8n-node lint` exits 0; CI runs lint as part of the matrix.
+- Build and lint clean under `n8n-node build` and `n8n-node lint`
+  with `n8n.strict: true` and the default `@n8n/node-cli/eslint`
+  config — eligible for n8n Cloud verification.
+- Automated tests are intentionally omitted. n8n's strict
+  community-node eslint preset (`@n8n/community-nodes/no-restricted-imports`)
+  blocks `node:test`, `node:assert`, `vitest`, `jest`, and every
+  other test framework, and the strict-mode template requires the
+  default eslint config. Across the public ecosystem, Cloud-verified
+  packages ship without an automated test runner (see
+  `n8n-io/n8n-nodes-starter`); packages that ship tests opt out of
+  Cloud support. We chose Cloud verification eligibility over
+  automated tests. Manual workflow testing happens via `n8n-node dev`.
 - Voice gateway / UDP media transport, RPC, Embedded App SDK, Social
   SDK, Rich Presence are intentionally out of scope.
 
