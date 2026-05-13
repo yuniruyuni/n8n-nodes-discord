@@ -83,7 +83,6 @@ function getHeaderValue(headers: Record<string, unknown>, name: string): string 
 // Discord's Interaction Endpoint URL is configured manually in the Discord
 // Developer Portal — there is no API to register/check/delete it, so the
 // webhook lifecycle methods don't apply here.
-// eslint-disable-next-line @n8n/community-nodes/webhook-lifecycle-complete
 export class DiscordHttpInteractionTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Discord HTTP Interaction Trigger',
