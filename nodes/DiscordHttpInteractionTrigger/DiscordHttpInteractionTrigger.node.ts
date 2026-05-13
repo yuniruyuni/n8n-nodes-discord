@@ -4,6 +4,7 @@ import {
 	ApplicationError,
 	NodeConnectionTypes,
 	type IDataObject,
+	type IHookFunctions,
 	type INodeType,
 	type INodeTypeDescription,
 	type IWebhookFunctions,
@@ -80,10 +81,25 @@ function getHeaderValue(headers: Record<string, unknown>, name: string): string 
 	return typeof value === 'string' ? value : '';
 }
 
-// Discord's Interaction Endpoint URL is configured manually in the Discord
-// Developer Portal — there is no API to register/check/delete it, so the
-// webhook lifecycle methods don't apply here.
 export class DiscordHttpInteractionTrigger implements INodeType {
+	// Discord's Interaction Endpoint URL is configured manually in the Discord
+	// Developer Portal — there is no API to register/check/delete it. These
+	// no-op methods exist only to satisfy the webhook-lifecycle-complete lint
+	// rule; n8n still serves the webhook regardless of what they return.
+	webhookMethods = {
+		default: {
+			async checkExists(this: IHookFunctions): Promise<boolean> {
+				return true;
+			},
+			async create(this: IHookFunctions): Promise<boolean> {
+				return true;
+			},
+			async delete(this: IHookFunctions): Promise<boolean> {
+				return true;
+			},
+		},
+	};
+
 	description: INodeTypeDescription = {
 		displayName: 'Discord HTTP Interaction Trigger',
 		name: 'discordHttpInteractionTrigger',
