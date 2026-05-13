@@ -183,6 +183,7 @@ export class DiscordOAuth2 implements INodeType {
 		const returnData: INodeExecutionData[] = [];
 
 		for (let i = 0; i < items.length; i++) {
+			try {
 			const operation = this.getNodeParameter('operation', i) as string;
 
 			let url: string;
@@ -298,6 +299,17 @@ export class DiscordOAuth2 implements INodeType {
 				json: { url },
 				pairedItem: { item: i },
 			});
+			} catch (error) {
+				if (this.continueOnFail()) {
+					const message = error instanceof Error ? error.message : String(error);
+					returnData.push({
+						json: { error: message },
+						pairedItem: { item: i },
+					});
+					continue;
+				}
+				throw new NodeOperationError(this.getNode(), error as Error, { itemIndex: i });
+			}
 		}
 
 		return [returnData];
