@@ -1,6 +1,6 @@
 {
   "name": "@yuniruyuni/n8n-nodes-discord",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "n8n node for Discord API integration. Supports Discord REST operations, webhooks, interactions, and Gateway triggers.",
   "license": "MIT",
   "homepage": "https://github.com/yuniruyuni/n8n-nodes-discord",
