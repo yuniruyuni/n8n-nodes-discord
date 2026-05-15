@@ -13,6 +13,7 @@ Focused, copy-pasteable walkthroughs for `@yuniruyuni/n8n-nodes-discord`. Each f
 | [http-interactions-setup.md](./http-interactions-setup.md) | Wire the HTTP Interaction Trigger to the Developer Portal's Interactions Endpoint URL, then defer and follow up. |
 | [guild-scheduled-event.md](./guild-scheduled-event.md) | Create an `EXTERNAL` guild scheduled event with location metadata and a base64 cover image. |
 | [ban-and-audit-log.md](./ban-and-audit-log.md) | Ban a user with a reason and history purge, then read back the `MEMBER_BAN_ADD` (22) audit log entry. |
+| [oauth2-url-builders.md](./oauth2-url-builders.md) | Build the Discord OAuth2 bot-install, authorize, and token revocation URLs with n8n's built-in Code node. |
 
 ## Conventions used in these examples
 
