@@ -51,6 +51,7 @@ export const applicationRoleConnectionMetadataFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['applicationRoleConnectionMetadata'],

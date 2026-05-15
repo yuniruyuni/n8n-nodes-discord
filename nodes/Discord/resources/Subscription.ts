@@ -48,6 +48,7 @@ export const subscriptionFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['subscription'],
@@ -61,6 +62,7 @@ export const subscriptionFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['subscription'],
@@ -138,6 +140,7 @@ export const subscriptionFields: INodeProperties[] = [
 		name: 'userId',
 		type: 'string',
 		default: '',
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['subscription'],

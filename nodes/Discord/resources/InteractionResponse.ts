@@ -553,6 +553,7 @@ export const interactionResponseFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['interactionResponse'],
@@ -575,6 +576,7 @@ export const interactionResponseFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['interactionResponse'],
@@ -605,6 +607,7 @@ export const interactionResponseFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['interactionResponse'],

@@ -41,6 +41,7 @@ import {
 } from '../shared/components';
 import { buildEmbedsFromCollection, createEmbedsCollectionField } from '../shared/embeds';
 import { parseOptionalJsonField } from '../shared/messagePayload';
+import { parseCommaSeparated } from '../shared/validators';
 
 // Read an attachments collection parameter into the normalized DiscordAttachmentInput list.
 function readAttachmentInputs(this: IExecuteSingleFunctions): DiscordAttachmentInput[] {
@@ -121,10 +122,7 @@ function readSnowflakeArray(context: IExecuteSingleFunctions, name: string): str
 	if (typeof value !== 'string' || value.trim() === '') {
 		return undefined;
 	}
-	const entries = value
-		.split(',')
-		.map((part) => part.trim())
-		.filter((part) => part.length > 0);
+	const entries = parseCommaSeparated(value);
 	return entries.length > 0 ? entries : undefined;
 }
 
@@ -616,6 +614,7 @@ const channelIdField: INodeProperties = {
 	type: 'string',
 	default: '',
 	required: true,
+	placeholder: 'e.g. 123456789012345678',
 	displayOptions: {
 		show: {
 			resource: ['webhook'],
@@ -631,6 +630,7 @@ const guildIdField: INodeProperties = {
 	type: 'string',
 	default: '',
 	required: true,
+	placeholder: 'e.g. 123456789012345678',
 	displayOptions: {
 		show: {
 			resource: ['webhook'],
@@ -646,6 +646,7 @@ const webhookIdField: INodeProperties = {
 	type: 'string',
 	default: '',
 	required: true,
+	placeholder: 'e.g. 123456789012345678',
 	displayOptions: {
 		show: {
 			resource: ['webhook'],
@@ -700,6 +701,7 @@ const messageIdField: INodeProperties = {
 	type: 'string',
 	default: '',
 	required: true,
+	placeholder: 'e.g. 123456789012345678',
 	displayOptions: {
 		show: {
 			resource: ['webhook'],
@@ -718,6 +720,7 @@ const webhookUrlField: INodeProperties = {
 	},
 	default: '',
 	required: true,
+	placeholder: 'https://discord.com/api/webhooks/...',
 	displayOptions: {
 		show: {
 			resource: ['webhook'],
@@ -775,6 +778,7 @@ const modifyChannelField: INodeProperties = {
 	name: 'channelId',
 	type: 'string',
 	default: '',
+	placeholder: 'e.g. 123456789012345678',
 	displayOptions: {
 		show: {
 			resource: ['webhook'],
@@ -923,6 +927,7 @@ const threadIdField: INodeProperties = {
 	name: 'threadId',
 	type: 'string',
 	default: '',
+	placeholder: 'e.g. 123456789012345678',
 	displayOptions: {
 		show: {
 			resource: ['webhook'],

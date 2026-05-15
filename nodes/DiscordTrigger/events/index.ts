@@ -101,8 +101,9 @@ export const triggerProperties: INodeProperties[] = [
 		name: 'event',
 		type: 'options',
 		noDataExpression: true,
+		required: true,
 		options: gatewayEventOptions,
-		default: 'MESSAGE_CREATE',
+		default: '',
 		description: 'Discord Gateway event to listen for. Full Gateway event coverage is tracked in the TODO.',
 	},
 	{
@@ -111,7 +112,7 @@ export const triggerProperties: INodeProperties[] = [
 		type: 'string',
 		default: 'default',
 		description:
-			'Identifier used by Discord Gateway Command nodes to route send events to this connection. Use distinct names if you run multiple Discord Triggers in the same n8n instance.',
+			'Identifier used by the Discord Gateway Send node to route commands to this connection. Default "default" works if you only have one Discord Trigger active.',
 	},
 	{
 		displayName: 'Auto Calculate Intents',

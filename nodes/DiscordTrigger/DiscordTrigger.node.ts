@@ -19,7 +19,7 @@ export class DiscordTrigger implements INodeType {
 		group: ['trigger'],
 		version: 1,
 		subtitle: '={{$parameter["event"]}}',
-		description: 'Listen to Discord Gateway events via WebSocket',
+		description: 'Listen to Discord Gateway events over a persistent WebSocket connection. Set "Connection Name" to allow the Discord Gateway Send node to push commands through this connection.',
 		defaults: {
 			name: 'Discord Trigger',
 		},

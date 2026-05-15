@@ -88,6 +88,7 @@ export const stageInstanceFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['stageInstance'],
@@ -146,6 +147,7 @@ export const stageInstanceFields: INodeProperties[] = [
 		name: 'guildScheduledEventId',
 		type: 'string',
 		default: '',
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['stageInstance'],

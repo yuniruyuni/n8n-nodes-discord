@@ -112,6 +112,7 @@ export const auditLogFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['auditLog'],
@@ -124,6 +125,7 @@ export const auditLogFields: INodeProperties[] = [
 		name: 'userId',
 		type: 'string',
 		default: '',
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['auditLog'],

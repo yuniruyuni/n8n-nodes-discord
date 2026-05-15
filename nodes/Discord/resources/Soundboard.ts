@@ -155,6 +155,7 @@ export const soundboardFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['soundboard'],
@@ -169,6 +170,7 @@ export const soundboardFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['soundboard'],
@@ -189,6 +191,7 @@ export const soundboardFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['soundboard'],
@@ -202,6 +205,7 @@ export const soundboardFields: INodeProperties[] = [
 		name: 'sourceGuildId',
 		type: 'string',
 		default: '',
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['soundboard'],
@@ -243,6 +247,7 @@ export const soundboardFields: INodeProperties[] = [
 		name: 'binaryPropertyName',
 		type: 'string',
 		default: '',
+		placeholder: 'data',
 		displayOptions: {
 			show: {
 				resource: ['soundboard'],
@@ -275,6 +280,7 @@ export const soundboardFields: INodeProperties[] = [
 		name: 'emojiId',
 		type: 'string',
 		default: '',
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['soundboard'],

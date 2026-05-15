@@ -189,6 +189,7 @@ export const guildScheduledEventFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['guildScheduledEvent'],
@@ -202,6 +203,7 @@ export const guildScheduledEventFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['guildScheduledEvent'],
@@ -235,6 +237,7 @@ export const guildScheduledEventFields: INodeProperties[] = [
 		name: 'channelId',
 		type: 'string',
 		default: '',
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['guildScheduledEvent'],
@@ -417,6 +420,7 @@ export const guildScheduledEventFields: INodeProperties[] = [
 		name: 'binaryPropertyName',
 		type: 'string',
 		default: '',
+		placeholder: 'data',
 		displayOptions: {
 			show: {
 				resource: ['guildScheduledEvent'],

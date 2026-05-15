@@ -205,6 +205,7 @@ export const emojiFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['emoji'],
@@ -225,6 +226,7 @@ export const emojiFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['emoji'],
@@ -245,6 +247,7 @@ export const emojiFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['emoji'],
@@ -297,6 +300,7 @@ export const emojiFields: INodeProperties[] = [
 		name: 'binaryPropertyName',
 		type: 'string',
 		default: '',
+		placeholder: 'data',
 		displayOptions: {
 			show: {
 				resource: ['emoji'],

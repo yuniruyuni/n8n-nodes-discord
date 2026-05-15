@@ -8,6 +8,7 @@ import {
 
 import { createAuditLogReasonField } from '../shared/auditLog';
 import { createRawJsonField, parseOptionalJsonField } from '../shared/messagePayload';
+import { parseCommaSeparated } from '../shared/validators';
 
 // Limits per Discord docs (auto-moderation-rule-object-trigger-metadata).
 const MAX_KEYWORD_FILTER_ENTRIES = 1000;
@@ -204,16 +205,6 @@ function buildGuidedActions(ctx: IExecuteSingleFunctions): IDataObject[] {
 	return built;
 }
 
-function splitSnowflakeCsv(value: unknown): string[] {
-	if (typeof value !== 'string' || value === '') {
-		return [];
-	}
-	return value
-		.split(',')
-		.map((entry) => entry.trim())
-		.filter((entry) => entry.length > 0);
-}
-
 // Build the full body for create/modify. Guided fields take precedence over raw
 // JSON escape hatches when both define the same key.
 function buildRuleBody(
@@ -294,12 +285,12 @@ function buildRuleBody(
 		body.enabled = enabled;
 	}
 
-	const exemptRoles = splitSnowflakeCsv(ctx.getNodeParameter('exemptRoles', ''));
+	const exemptRoles = parseCommaSeparated(ctx.getNodeParameter('exemptRoles', ''));
 	if (exemptRoles.length > 0) {
 		body.exempt_roles = exemptRoles;
 	}
 
-	const exemptChannels = splitSnowflakeCsv(ctx.getNodeParameter('exemptChannels', ''));
+	const exemptChannels = parseCommaSeparated(ctx.getNodeParameter('exemptChannels', ''));
 	if (exemptChannels.length > 0) {
 		body.exempt_channels = exemptChannels;
 	}
@@ -432,6 +423,7 @@ export const autoModerationFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['autoModeration'],
@@ -445,6 +437,7 @@ export const autoModerationFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['autoModeration'],
@@ -736,6 +729,7 @@ export const autoModerationFields: INodeProperties[] = [
 						type: 'string',
 						default: '',
 						required: true,
+						placeholder: 'e.g. 123456789012345678',
 						displayOptions: {
 							show: {
 								type: [2],

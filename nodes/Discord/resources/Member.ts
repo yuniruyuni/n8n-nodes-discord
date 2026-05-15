@@ -71,6 +71,7 @@ export const memberFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['member'],
@@ -84,6 +85,7 @@ export const memberFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['member'],
@@ -109,6 +111,7 @@ export const memberFields: INodeProperties[] = [
 		name: 'roleIds',
 		type: 'string',
 		default: '',
+		placeholder: 'e.g. 123456789012345678, 234567890123456789',
 		displayOptions: {
 			show: {
 				resource: ['member'],

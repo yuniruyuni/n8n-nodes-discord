@@ -52,6 +52,13 @@ export class Discord implements INodeType {
 					'Bot tokens are used for server automation. OAuth2 user tokens are required for operations that act on behalf of a specific user (e.g., list current user guilds, get user connections, create group DM, update role connection).',
 			},
 			{
+				displayName:
+					'Bot Token is for server automation (sending messages, moderation). OAuth2 (User Token) is required for operations that act on behalf of a specific user, marked "Requires OAuth2 user token" in their description (e.g., User: getCurrentConnections, getCurrentApplicationRoleConnection, updateCurrentApplicationRoleConnection, createGroupDm).',
+				name: 'authenticationNotice',
+				type: 'notice',
+				default: '',
+			},
+			{
 				displayName: 'Resource',
 				name: 'resource',
 				type: 'options',

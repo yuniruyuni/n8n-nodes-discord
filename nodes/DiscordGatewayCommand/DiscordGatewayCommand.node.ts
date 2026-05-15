@@ -24,16 +24,16 @@ function splitSnowflakes(value: string): string[] {
 
 export class DiscordGatewayCommand implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Discord Gateway Command',
+		displayName: 'Discord Gateway Send',
 		name: 'discordGatewayCommand',
 		icon: { light: 'file:discord.svg', dark: 'file:discord.dark.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',
 		description:
-			'Send a Discord Gateway command (Update Presence, Update Voice State, Request Guild Members, Request Soundboard Sounds) through an active Discord Trigger connection',
+			'Send Discord Gateway commands (presence, voice state, member request, soundboard) through a running Discord Trigger connection',
 		defaults: {
-			name: 'Discord Gateway Command',
+			name: 'Discord Gateway Send',
 		},
 		usableAsTool: true,
 		inputs: [NodeConnectionTypes.Main],
@@ -41,12 +41,19 @@ export class DiscordGatewayCommand implements INodeType {
 		credentials: [],
 		properties: [
 			{
+				displayName:
+					'This node sends commands through a running Discord Trigger\'s WebSocket connection. The Trigger must be active in the same n8n process. Set "Connection Name" to match the Trigger\'s value (default: "default").',
+				name: 'notice',
+				type: 'notice',
+				default: '',
+			},
+			{
 				displayName: 'Connection Name',
 				name: 'connectionName',
 				type: 'string',
 				default: 'default',
 				description:
-					"Name of the Discord Trigger's connection to send through. Must match the Connection Name on a running Discord Trigger.",
+					'Name of the Discord Trigger connection to send through. Match this with the Connection Name on a running Discord Trigger. Default "default" works if you only have one Trigger.',
 			},
 			{
 				displayName: 'Operation',
@@ -58,26 +65,28 @@ export class DiscordGatewayCommand implements INodeType {
 						name: 'Request Guild Members',
 						value: 'requestGuildMembers',
 						description:
-							'Bulk-request members of a guild; response arrives as GUILD_MEMBERS_CHUNK events (opcode 8)',
+							'Request the full member list of a guild. The result arrives as a GUILD_MEMBERS_CHUNK event on the matching Discord Trigger.',
 						action: 'Request guild members',
 					},
 					{
 						name: 'Request Soundboard Sounds',
 						value: 'requestSoundboardSounds',
 						description:
-							'Request available soundboard sounds in guilds; response arrives as SOUNDBOARD_SOUNDS events (opcode 31)',
+							'Request the available soundboard sounds in one or more guilds. The result arrives as SOUNDBOARD_SOUNDS events on the matching Discord Trigger.',
 						action: 'Request soundboard sounds',
 					},
 					{
 						name: 'Update Presence',
 						value: 'updatePresence',
-						description: "Set the bot's status and current activity (opcode 3)",
+						description:
+							'Change what the bot is shown as doing across all servers (e.g., "Playing Minecraft", "Listening to Lo-Fi"). Updates appear in member lists and the bot\'s profile.',
 						action: 'Update presence',
 					},
 					{
 						name: 'Update Voice State',
 						value: 'updateVoiceState',
-						description: 'Join, leave, or move the bot in a voice channel (opcode 4)',
+						description:
+							'Move the bot into, out of, or between voice channels. Also toggles self mute and self deafen. Does not transmit audio.',
 						action: 'Update voice state',
 					},
 				],
@@ -121,13 +130,43 @@ export class DiscordGatewayCommand implements INodeType {
 				name: 'activityType',
 				type: 'options',
 				options: [
-					{ name: 'Competing', value: 5 },
-					{ name: 'Custom', value: 4 },
-					{ name: 'Game (Playing)', value: 0 },
-					{ name: 'Listening', value: 2 },
-					{ name: 'None', value: -1 },
-					{ name: 'Streaming', value: 1 },
-					{ name: 'Watching', value: 3 },
+					{
+						name: 'Competing In',
+						value: 5,
+						description: 'Shows as "Competing in &lt;name&gt;"',
+					},
+					{
+						name: 'Custom Status',
+						value: 4,
+						description:
+							'Shows just the text without a prefix; use "Activity State" for the visible text',
+					},
+					{
+						name: 'Listening To',
+						value: 2,
+						description: 'Shows as "Listening to &lt;name&gt;"',
+					},
+					{
+						name: 'None (Clear Activity)',
+						value: -1,
+						description: "Clear the bot's current activity",
+					},
+					{
+						name: 'Playing',
+						value: 0,
+						description: 'Shows as "Playing &lt;name&gt;" under the bot',
+					},
+					{
+						name: 'Streaming',
+						value: 1,
+						description:
+							'Shows as "Streaming &lt;name&gt;" with a link (requires a Twitch or YouTube URL)',
+					},
+					{
+						name: 'Watching',
+						value: 3,
+						description: 'Shows as "Watching &lt;name&gt;"',
+					},
 				],
 				default: -1,
 				displayOptions: { show: { operation: ['updatePresence'] } },
@@ -181,6 +220,7 @@ export class DiscordGatewayCommand implements INodeType {
 				type: 'string',
 				default: '',
 				required: true,
+				placeholder: 'e.g. 123456789012345678',
 				displayOptions: {
 					show: { operation: ['updateVoiceState', 'requestGuildMembers'] },
 				},
@@ -191,6 +231,7 @@ export class DiscordGatewayCommand implements INodeType {
 				name: 'channelId',
 				type: 'string',
 				default: '',
+				placeholder: 'e.g. 123456789012345678',
 				displayOptions: { show: { operation: ['updateVoiceState'] } },
 				description: 'Snowflake ID of the voice channel. Leave empty to disconnect.',
 			},
@@ -244,6 +285,7 @@ export class DiscordGatewayCommand implements INodeType {
 				name: 'userIds',
 				type: 'string',
 				default: '',
+				placeholder: 'e.g. 123456789012345678, 234567890123456789',
 				displayOptions: { show: { operation: ['requestGuildMembers'] } },
 				description:
 					'Comma-separated snowflake IDs to fetch (max 100). Mutually exclusive with Query.',
@@ -265,6 +307,7 @@ export class DiscordGatewayCommand implements INodeType {
 				type: 'string',
 				default: '',
 				required: true,
+				placeholder: 'e.g. 123456789012345678, 234567890123456789',
 				displayOptions: { show: { operation: ['requestSoundboardSounds'] } },
 				description: 'Comma-separated snowflake IDs of guilds to request soundboard sounds for',
 			},

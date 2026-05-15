@@ -437,6 +437,7 @@ export const guildFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['guild'],
@@ -607,6 +608,7 @@ export const guildFields: INodeProperties[] = [
 		name: 'afkChannelId',
 		type: 'string',
 		default: '',
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['guild'],
@@ -633,6 +635,7 @@ export const guildFields: INodeProperties[] = [
 		name: 'systemChannelId',
 		type: 'string',
 		default: '',
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['guild'],
@@ -676,6 +679,7 @@ export const guildFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['guild'],
@@ -863,6 +867,7 @@ export const guildFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['guild'],
@@ -889,6 +894,7 @@ export const guildFields: INodeProperties[] = [
 		name: 'channelId',
 		type: 'string',
 		default: '',
+		placeholder: 'e.g. 123456789012345678',
 		displayOptions: {
 			show: {
 				resource: ['guild'],
@@ -960,6 +966,7 @@ export const guildFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. 123456789012345678, 234567890123456789',
 		displayOptions: {
 			show: {
 				resource: ['guild'],

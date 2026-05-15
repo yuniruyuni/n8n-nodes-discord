@@ -46,6 +46,7 @@ export const inviteFields: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		required: true,
+		placeholder: 'e.g. discordBan',
 		displayOptions: {
 			show: {
 				resource: ['invite'],
