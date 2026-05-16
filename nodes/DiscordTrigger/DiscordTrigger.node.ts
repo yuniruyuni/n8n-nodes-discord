@@ -24,6 +24,24 @@ export class DiscordTrigger implements INodeType {
 			name: 'Discord Trigger',
 		},
 		usableAsTool: true,
+		codex: {
+			categories: ['Communication'],
+			subcategories: {
+				Communication: ['Messaging'],
+			},
+			alias: [
+				'bot',
+				'gateway',
+				'websocket',
+				'event',
+				'message create',
+				'interaction',
+				'guild member add',
+				'voice state',
+				'listen',
+				'webhook',
+			],
+		},
 		inputs: [],
 		outputs: [NodeConnectionTypes.Main],
 		credentials: [

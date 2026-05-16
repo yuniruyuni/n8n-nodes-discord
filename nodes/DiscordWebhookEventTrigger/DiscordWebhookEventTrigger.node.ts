@@ -127,6 +127,23 @@ export class DiscordWebhookEventTrigger implements INodeType {
 		name: 'discordWebhookEventTrigger',
 		icon: { light: 'file:discord.svg', dark: 'file:discord.dark.svg' },
 		group: ['trigger'],
+		codex: {
+			categories: ['Communication'],
+			subcategories: {
+				Communication: ['Messaging'],
+			},
+			alias: [
+				'application webhook',
+				'entitlement',
+				'authorization',
+				'quest',
+				'lobby',
+				'monetization',
+				'purchase',
+				'subscription',
+				'webhook event',
+			],
+		},
 		version: 1,
 		subtitle: '={{$parameter["path"]}}',
 		description:
