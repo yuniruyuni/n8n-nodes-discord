@@ -33,7 +33,7 @@ export const lobbyOperations: INodeProperties[] = [
 			{
 				name: 'Create',
 				value: 'create',
-				action: 'Create a lobby',
+				action: 'Create',
 				routing: {
 					request: {
 						method: 'POST',
@@ -45,7 +45,7 @@ export const lobbyOperations: INodeProperties[] = [
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get a lobby',
+				action: 'Get',
 				routing: {
 					request: {
 						method: 'GET',
@@ -56,7 +56,7 @@ export const lobbyOperations: INodeProperties[] = [
 			{
 				name: 'Modify',
 				value: 'modify',
-				action: 'Modify a lobby',
+				action: 'Modify',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -68,7 +68,7 @@ export const lobbyOperations: INodeProperties[] = [
 			{
 				name: 'Delete',
 				value: 'delete',
-				action: 'Delete a lobby',
+				action: 'Delete',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -89,7 +89,7 @@ export const lobbyOperations: INodeProperties[] = [
 			{
 				name: 'Add Member',
 				value: 'addMember',
-				action: 'Add a member to a lobby',
+				action: 'Add member',
 				routing: {
 					request: {
 						method: 'PUT',
@@ -101,7 +101,7 @@ export const lobbyOperations: INodeProperties[] = [
 			{
 				name: 'Remove Member',
 				value: 'removeMember',
-				action: 'Remove a member from a lobby',
+				action: 'Remove member',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -122,7 +122,7 @@ export const lobbyOperations: INodeProperties[] = [
 			{
 				name: 'Leave Lobby',
 				value: 'leaveLobby',
-				action: 'Leave a lobby as the current user',
+				action: 'Leave lobby',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -143,7 +143,7 @@ export const lobbyOperations: INodeProperties[] = [
 			{
 				name: 'Link Channel',
 				value: 'linkChannel',
-				action: 'Link a channel to a lobby',
+				action: 'Link channel',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -155,7 +155,7 @@ export const lobbyOperations: INodeProperties[] = [
 			{
 				name: 'Unlink Channel',
 				value: 'unlinkChannel',
-				action: 'Unlink the channel from a lobby',
+				action: 'Unlink channel',
 				routing: {
 					request: {
 						method: 'PATCH',

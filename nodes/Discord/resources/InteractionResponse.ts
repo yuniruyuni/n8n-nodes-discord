@@ -442,7 +442,7 @@ export const interactionResponseOperations: INodeProperties[] = [
 			{
 				name: 'Create Followup Message',
 				value: 'createFollowupMessage',
-				action: 'Create a followup interaction response message',
+				action: 'Create followup message',
 				routing: {
 					send: {
 						preSend: [presendCreateFollowup],
@@ -456,7 +456,7 @@ export const interactionResponseOperations: INodeProperties[] = [
 			{
 				name: 'Create Initial Callback',
 				value: 'createInitialCallback',
-				action: 'Create an initial interaction callback response',
+				action: 'Create initial callback',
 				routing: {
 					send: {
 						preSend: [presendInitialCallback],
@@ -470,7 +470,7 @@ export const interactionResponseOperations: INodeProperties[] = [
 			{
 				name: 'Delete Followup Message',
 				value: 'deleteFollowupMessage',
-				action: 'Delete a followup interaction response message',
+				action: 'Delete followup message',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -482,7 +482,7 @@ export const interactionResponseOperations: INodeProperties[] = [
 			{
 				name: 'Delete Original Response',
 				value: 'deleteOriginalResponse',
-				action: 'Delete the original interaction response',
+				action: 'Delete original response',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -494,7 +494,7 @@ export const interactionResponseOperations: INodeProperties[] = [
 			{
 				name: 'Edit Followup Message',
 				value: 'editFollowupMessage',
-				action: 'Edit a followup interaction response message',
+				action: 'Edit followup message',
 				routing: {
 					send: {
 						preSend: [presendEditMessage],
@@ -508,7 +508,7 @@ export const interactionResponseOperations: INodeProperties[] = [
 			{
 				name: 'Edit Original Response',
 				value: 'editOriginalResponse',
-				action: 'Edit the original interaction response',
+				action: 'Edit original response',
 				routing: {
 					send: {
 						preSend: [presendEditMessage],
@@ -522,7 +522,7 @@ export const interactionResponseOperations: INodeProperties[] = [
 			{
 				name: 'Get Followup Message',
 				value: 'getFollowupMessage',
-				action: 'Get a followup interaction response message',
+				action: 'Get followup message',
 				routing: {
 					request: {
 						method: 'GET',
@@ -533,7 +533,7 @@ export const interactionResponseOperations: INodeProperties[] = [
 			{
 				name: 'Get Original Response',
 				value: 'getOriginalResponse',
-				action: 'Get the original interaction response',
+				action: 'Get original response',
 				routing: {
 					request: {
 						method: 'GET',

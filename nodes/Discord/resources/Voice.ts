@@ -20,7 +20,7 @@ export const voiceOperations: INodeProperties[] = [
 			{
 				name: 'Get Current User Voice State',
 				value: 'getCurrentUserVoiceState',
-				action: 'Get the current user voice state',
+				action: 'Get current user voice state',
 				routing: {
 					request: {
 						method: 'GET',
@@ -31,7 +31,7 @@ export const voiceOperations: INodeProperties[] = [
 			{
 				name: 'Get User Voice State',
 				value: 'getUserVoiceState',
-				action: 'Get a user voice state',
+				action: 'Get user voice state',
 				routing: {
 					request: {
 						method: 'GET',
@@ -42,7 +42,7 @@ export const voiceOperations: INodeProperties[] = [
 			{
 				name: 'List Regions',
 				value: 'listRegions',
-				action: 'List voice regions',
+				action: 'List regions',
 				routing: {
 					request: {
 						method: 'GET',
@@ -53,7 +53,7 @@ export const voiceOperations: INodeProperties[] = [
 			{
 				name: 'Modify Current User Voice State',
 				value: 'modifyCurrentUserVoiceState',
-				action: 'Modify the current user voice state',
+				action: 'Modify current user voice state',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -64,7 +64,7 @@ export const voiceOperations: INodeProperties[] = [
 			{
 				name: 'Modify User Voice State',
 				value: 'modifyUserVoiceState',
-				action: 'Modify a user voice state',
+				action: 'Modify user voice state',
 				routing: {
 					request: {
 						method: 'PATCH',

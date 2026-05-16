@@ -53,7 +53,7 @@ export const soundboardOperations: INodeProperties[] = [
 			{
 				name: 'Send Sound',
 				value: 'sendSound',
-				action: 'Send a soundboard sound to a channel',
+				action: 'Send sound',
 				routing: {
 					request: {
 						method: 'POST',
@@ -65,7 +65,7 @@ export const soundboardOperations: INodeProperties[] = [
 			{
 				name: 'List Default Sounds',
 				value: 'listDefaultSounds',
-				action: 'List default soundboard sounds',
+				action: 'List default sounds',
 				routing: {
 					request: {
 						method: 'GET',
@@ -76,7 +76,7 @@ export const soundboardOperations: INodeProperties[] = [
 			{
 				name: 'List Guild Sounds',
 				value: 'listGuildSounds',
-				action: 'List guild soundboard sounds',
+				action: 'List guild sounds',
 				routing: {
 					request: {
 						method: 'GET',
@@ -87,7 +87,7 @@ export const soundboardOperations: INodeProperties[] = [
 			{
 				name: 'Get Guild Sound',
 				value: 'getGuildSound',
-				action: 'Get a guild soundboard sound',
+				action: 'Get guild sound',
 				routing: {
 					request: {
 						method: 'GET',
@@ -98,7 +98,7 @@ export const soundboardOperations: INodeProperties[] = [
 			{
 				name: 'Create Guild Sound',
 				value: 'createGuildSound',
-				action: 'Create a guild soundboard sound',
+				action: 'Create guild sound',
 				routing: {
 					send: {
 						preSend: [presendSoundboardSound],
@@ -113,7 +113,7 @@ export const soundboardOperations: INodeProperties[] = [
 			{
 				name: 'Modify Guild Sound',
 				value: 'modifyGuildSound',
-				action: 'Modify a guild soundboard sound',
+				action: 'Modify guild sound',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -125,7 +125,7 @@ export const soundboardOperations: INodeProperties[] = [
 			{
 				name: 'Delete Guild Sound',
 				value: 'deleteGuildSound',
-				action: 'Delete a guild soundboard sound',
+				action: 'Delete guild sound',
 				routing: {
 					request: {
 						method: 'DELETE',

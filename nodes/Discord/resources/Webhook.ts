@@ -406,7 +406,7 @@ export const webhookOperations: INodeProperties[] = [
 			{
 				name: 'Create',
 				value: 'create',
-				action: 'Create a webhook in a channel',
+				action: 'Create',
 				routing: {
 					request: {
 						method: 'POST',
@@ -418,7 +418,7 @@ export const webhookOperations: INodeProperties[] = [
 			{
 				name: 'Delete',
 				value: 'delete',
-				action: 'Delete a webhook',
+				action: 'Delete',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -430,7 +430,7 @@ export const webhookOperations: INodeProperties[] = [
 			{
 				name: 'Delete Message',
 				value: 'deleteMessage',
-				action: 'Delete a webhook message',
+				action: 'Delete message',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -445,7 +445,7 @@ export const webhookOperations: INodeProperties[] = [
 			{
 				name: 'Delete With Token',
 				value: 'deleteWithToken',
-				action: 'Delete a webhook using its token',
+				action: 'Delete with token',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -457,7 +457,7 @@ export const webhookOperations: INodeProperties[] = [
 			{
 				name: 'Edit Message',
 				value: 'editMessage',
-				action: 'Edit a webhook message',
+				action: 'Edit message',
 				routing: {
 					send: {
 						preSend: [presendWebhookEditMessage],
@@ -474,7 +474,7 @@ export const webhookOperations: INodeProperties[] = [
 			{
 				name: 'Execute',
 				value: 'execute',
-				action: 'Execute a webhook',
+				action: 'Execute',
 				routing: {
 					send: {
 						preSend: [presendWebhookExecute],
@@ -492,7 +492,7 @@ export const webhookOperations: INodeProperties[] = [
 			{
 				name: 'Execute GitHub',
 				value: 'executeGithub',
-				action: 'Execute a webhook with a github payload',
+				action: 'Execute git hub',
 				routing: {
 					request: {
 						method: 'POST',
@@ -508,7 +508,7 @@ export const webhookOperations: INodeProperties[] = [
 			{
 				name: 'Execute Slack',
 				value: 'executeSlack',
-				action: 'Execute a webhook with a slack payload',
+				action: 'Execute slack',
 				routing: {
 					request: {
 						method: 'POST',
@@ -524,7 +524,7 @@ export const webhookOperations: INodeProperties[] = [
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get a webhook',
+				action: 'Get',
 				routing: {
 					request: {
 						method: 'GET',
@@ -535,7 +535,7 @@ export const webhookOperations: INodeProperties[] = [
 			{
 				name: 'Get Channel Webhooks',
 				value: 'getChannelWebhooks',
-				action: 'Get all webhooks for a channel',
+				action: 'Get channel webhooks',
 				routing: {
 					request: {
 						method: 'GET',
@@ -546,7 +546,7 @@ export const webhookOperations: INodeProperties[] = [
 			{
 				name: 'Get Guild Webhooks',
 				value: 'getGuildWebhooks',
-				action: 'Get all webhooks for a guild',
+				action: 'Get guild webhooks',
 				routing: {
 					request: {
 						method: 'GET',
@@ -557,7 +557,7 @@ export const webhookOperations: INodeProperties[] = [
 			{
 				name: 'Get Message',
 				value: 'getMessage',
-				action: 'Get a previously sent webhook message',
+				action: 'Get message',
 				routing: {
 					request: {
 						method: 'GET',
@@ -571,7 +571,7 @@ export const webhookOperations: INodeProperties[] = [
 			{
 				name: 'Get With Token',
 				value: 'getWithToken',
-				action: 'Get a webhook using its token',
+				action: 'Get with token',
 				routing: {
 					request: {
 						method: 'GET',
@@ -582,7 +582,7 @@ export const webhookOperations: INodeProperties[] = [
 			{
 				name: 'Modify',
 				value: 'modify',
-				action: 'Modify a webhook',
+				action: 'Modify',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -594,7 +594,7 @@ export const webhookOperations: INodeProperties[] = [
 			{
 				name: 'Modify With Token',
 				value: 'modifyWithToken',
-				action: 'Modify a webhook using its token',
+				action: 'Modify with token',
 				routing: {
 					request: {
 						method: 'PATCH',

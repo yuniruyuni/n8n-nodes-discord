@@ -26,7 +26,7 @@ export const guildTemplateOperations: INodeProperties[] = [
 			{
 				name: 'Get Template',
 				value: 'getTemplate',
-				action: 'Get a guild template',
+				action: 'Get template',
 				routing: {
 					request: {
 						method: 'GET',
@@ -37,7 +37,7 @@ export const guildTemplateOperations: INodeProperties[] = [
 			{
 				name: 'Create Guild From Template',
 				value: 'createGuildFromTemplate',
-				action: 'Create a guild from template',
+				action: 'Create guild from template',
 				routing: {
 					request: {
 						method: 'POST',
@@ -60,7 +60,7 @@ export const guildTemplateOperations: INodeProperties[] = [
 			{
 				name: 'Create Guild Template',
 				value: 'createGuildTemplate',
-				action: 'Create a guild template',
+				action: 'Create guild template',
 				routing: {
 					request: {
 						method: 'POST',
@@ -72,7 +72,7 @@ export const guildTemplateOperations: INodeProperties[] = [
 			{
 				name: 'Sync Guild Template',
 				value: 'syncGuildTemplate',
-				action: 'Sync a guild template',
+				action: 'Sync guild template',
 				routing: {
 					request: {
 						method: 'PUT',
@@ -83,7 +83,7 @@ export const guildTemplateOperations: INodeProperties[] = [
 			{
 				name: 'Modify Guild Template',
 				value: 'modifyGuildTemplate',
-				action: 'Modify a guild template',
+				action: 'Modify guild template',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -95,7 +95,7 @@ export const guildTemplateOperations: INodeProperties[] = [
 			{
 				name: 'Delete Guild Template',
 				value: 'deleteGuildTemplate',
-				action: 'Delete a guild template',
+				action: 'Delete guild template',
 				routing: {
 					request: {
 						method: 'DELETE',

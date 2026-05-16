@@ -17,7 +17,7 @@ export const subscriptionOperations: INodeProperties[] = [
 			{
 				name: 'List for SKU',
 				value: 'listForSku',
-				action: 'List subscriptions for an SKU',
+				action: 'List for SKU',
 				routing: {
 					request: {
 						method: 'GET',
@@ -28,7 +28,7 @@ export const subscriptionOperations: INodeProperties[] = [
 			{
 				name: 'Get for SKU',
 				value: 'getForSku',
-				action: 'Get a subscription for an SKU',
+				action: 'Get for SKU',
 				routing: {
 					request: {
 						method: 'GET',

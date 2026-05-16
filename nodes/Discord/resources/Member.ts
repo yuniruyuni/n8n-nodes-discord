@@ -18,7 +18,7 @@ export const memberOperations: INodeProperties[] = [
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get a guild member',
+				action: 'Get',
 				routing: {
 					request: {
 						method: 'GET',
@@ -29,7 +29,7 @@ export const memberOperations: INodeProperties[] = [
 			{
 				name: 'Modify',
 				value: 'modify',
-				action: 'Modify a guild member',
+				action: 'Modify',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -41,7 +41,7 @@ export const memberOperations: INodeProperties[] = [
 			{
 				name: 'Remove',
 				value: 'remove',
-				action: 'Remove a guild member',
+				action: 'Remove',
 				routing: {
 					request: {
 						method: 'DELETE',

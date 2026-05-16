@@ -29,7 +29,7 @@ export const entitlementOperations: INodeProperties[] = [
 			{
 				name: 'List',
 				value: 'list',
-				action: 'List entitlements',
+				action: 'List',
 				routing: {
 					request: {
 						method: 'GET',
@@ -40,7 +40,7 @@ export const entitlementOperations: INodeProperties[] = [
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get an entitlement',
+				action: 'Get',
 				routing: {
 					request: {
 						method: 'GET',
@@ -51,7 +51,7 @@ export const entitlementOperations: INodeProperties[] = [
 			{
 				name: 'Consume',
 				value: 'consume',
-				action: 'Consume an entitlement',
+				action: 'Consume',
 				routing: {
 					request: {
 						method: 'POST',
@@ -63,7 +63,7 @@ export const entitlementOperations: INodeProperties[] = [
 			{
 				name: 'Create Test',
 				value: 'createTest',
-				action: 'Create a test entitlement',
+				action: 'Create test',
 				routing: {
 					request: {
 						method: 'POST',
@@ -75,7 +75,7 @@ export const entitlementOperations: INodeProperties[] = [
 			{
 				name: 'Delete Test',
 				value: 'deleteTest',
-				action: 'Delete a test entitlement',
+				action: 'Delete test',
 				routing: {
 					request: {
 						method: 'DELETE',

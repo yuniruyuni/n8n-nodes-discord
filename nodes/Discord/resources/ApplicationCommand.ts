@@ -350,7 +350,7 @@ export const applicationCommandOperations: INodeProperties[] = [
 			{
 				name: 'Bulk Overwrite Global',
 				value: 'bulkOverwriteGlobal',
-				action: 'Bulk overwrite global application commands',
+				action: 'Bulk overwrite global',
 				routing: {
 					request: {
 						method: 'PUT',
@@ -362,7 +362,7 @@ export const applicationCommandOperations: INodeProperties[] = [
 			{
 				name: 'Bulk Overwrite Guild',
 				value: 'bulkOverwriteGuild',
-				action: 'Bulk overwrite guild application commands',
+				action: 'Bulk overwrite guild',
 				routing: {
 					request: {
 						method: 'PUT',
@@ -374,7 +374,7 @@ export const applicationCommandOperations: INodeProperties[] = [
 			{
 				name: 'Create Global',
 				value: 'createGlobal',
-				action: 'Create a global application command',
+				action: 'Create global',
 				routing: {
 					send: {
 						preSend: [presendApplicationCommand],
@@ -388,7 +388,7 @@ export const applicationCommandOperations: INodeProperties[] = [
 			{
 				name: 'Create Guild',
 				value: 'createGuild',
-				action: 'Create a guild application command',
+				action: 'Create guild',
 				routing: {
 					send: {
 						preSend: [presendApplicationCommand],
@@ -402,7 +402,7 @@ export const applicationCommandOperations: INodeProperties[] = [
 			{
 				name: 'Delete Global',
 				value: 'deleteGlobal',
-				action: 'Delete a global application command',
+				action: 'Delete global',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -414,7 +414,7 @@ export const applicationCommandOperations: INodeProperties[] = [
 			{
 				name: 'Delete Guild',
 				value: 'deleteGuild',
-				action: 'Delete a guild application command',
+				action: 'Delete guild',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -426,7 +426,7 @@ export const applicationCommandOperations: INodeProperties[] = [
 			{
 				name: 'Get Global',
 				value: 'getGlobal',
-				action: 'Get a global application command',
+				action: 'Get global',
 				routing: {
 					request: {
 						method: 'GET',
@@ -437,7 +437,7 @@ export const applicationCommandOperations: INodeProperties[] = [
 			{
 				name: 'Get Guild',
 				value: 'getGuild',
-				action: 'Get a guild application command',
+				action: 'Get guild',
 				routing: {
 					request: {
 						method: 'GET',
@@ -448,7 +448,7 @@ export const applicationCommandOperations: INodeProperties[] = [
 			{
 				name: 'Get Guild Command Permissions',
 				value: 'getGuildCommandPermissions',
-				action: 'Get guild application command permissions',
+				action: 'Get guild command permissions',
 				routing: {
 					request: {
 						method: 'GET',
@@ -459,7 +459,7 @@ export const applicationCommandOperations: INodeProperties[] = [
 			{
 				name: 'List Global',
 				value: 'listGlobal',
-				action: 'List global application commands',
+				action: 'List global',
 				routing: {
 					request: {
 						method: 'GET',
@@ -470,7 +470,7 @@ export const applicationCommandOperations: INodeProperties[] = [
 			{
 				name: 'List Guild',
 				value: 'listGuild',
-				action: 'List guild application commands',
+				action: 'List guild',
 				routing: {
 					request: {
 						method: 'GET',
@@ -481,7 +481,7 @@ export const applicationCommandOperations: INodeProperties[] = [
 			{
 				name: 'Update Global',
 				value: 'updateGlobal',
-				action: 'Update a global application command',
+				action: 'Update global',
 				routing: {
 					send: {
 						preSend: [presendApplicationCommand],
@@ -495,7 +495,7 @@ export const applicationCommandOperations: INodeProperties[] = [
 			{
 				name: 'Update Guild',
 				value: 'updateGuild',
-				action: 'Update a guild application command',
+				action: 'Update guild',
 				routing: {
 					send: {
 						preSend: [presendApplicationCommand],
@@ -509,7 +509,7 @@ export const applicationCommandOperations: INodeProperties[] = [
 			{
 				name: 'Update Guild Command Permissions',
 				value: 'updateGuildCommandPermissions',
-				action: 'Update guild application command permissions',
+				action: 'Update guild command permissions',
 				routing: {
 					request: {
 						method: 'PUT',

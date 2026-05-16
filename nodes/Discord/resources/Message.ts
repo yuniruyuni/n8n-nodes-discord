@@ -263,7 +263,7 @@ export const messageOperations: INodeProperties[] = [
 			{
 				name: 'Send',
 				value: 'send',
-				action: 'Send a message',
+				action: 'Send',
 				routing: {
 					send: {
 						preSend: [presendMessageWithOptionalAttachments],
@@ -277,7 +277,7 @@ export const messageOperations: INodeProperties[] = [
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get a message',
+				action: 'Get',
 				routing: {
 					request: {
 						method: 'GET',
@@ -288,7 +288,7 @@ export const messageOperations: INodeProperties[] = [
 			{
 				name: 'List',
 				value: 'list',
-				action: 'List channel messages',
+				action: 'List',
 				routing: {
 					request: {
 						method: 'GET',
@@ -299,7 +299,7 @@ export const messageOperations: INodeProperties[] = [
 			{
 				name: 'Edit',
 				value: 'edit',
-				action: 'Edit a message',
+				action: 'Edit',
 				routing: {
 					send: {
 						preSend: [presendMessageWithOptionalAttachments],
@@ -313,7 +313,7 @@ export const messageOperations: INodeProperties[] = [
 			{
 				name: 'Delete',
 				value: 'delete',
-				action: 'Delete a message',
+				action: 'Delete',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -334,7 +334,7 @@ export const messageOperations: INodeProperties[] = [
 			{
 				name: 'Bulk Delete',
 				value: 'bulkDelete',
-				action: 'Bulk delete messages',
+				action: 'Bulk delete',
 				routing: {
 					request: {
 						method: 'POST',
@@ -359,7 +359,7 @@ export const messageOperations: INodeProperties[] = [
 			{
 				name: 'Crosspost',
 				value: 'crosspost',
-				action: 'Crosspost an announcement message',
+				action: 'Crosspost',
 				routing: {
 					request: {
 						method: 'POST',

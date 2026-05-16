@@ -47,7 +47,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get a guild',
+				action: 'Get',
 				routing: {
 					request: {
 						method: 'GET',
@@ -58,7 +58,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Modify',
 				value: 'modify',
-				action: 'Modify a guild',
+				action: 'Modify',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -70,7 +70,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Get Channels',
 				value: 'getChannels',
-				action: 'Get guild channels',
+				action: 'Get channels',
 				routing: {
 					request: {
 						method: 'GET',
@@ -81,7 +81,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Create',
 				value: 'create',
-				action: 'Create a guild',
+				action: 'Create',
 				routing: {
 					request: {
 						method: 'POST',
@@ -93,7 +93,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Get Preview',
 				value: 'getPreview',
-				action: 'Get a guild preview',
+				action: 'Get preview',
 				routing: {
 					request: {
 						method: 'GET',
@@ -104,7 +104,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Delete',
 				value: 'delete',
-				action: 'Delete a guild',
+				action: 'Delete',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -125,7 +125,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Modify Channel Positions',
 				value: 'modifyChannelPositions',
-				action: 'Modify guild channel positions',
+				action: 'Modify channel positions',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -137,7 +137,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'List Active Threads',
 				value: 'listActiveThreads',
-				action: 'List active guild threads',
+				action: 'List active threads',
 				routing: {
 					request: {
 						method: 'GET',
@@ -148,7 +148,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Get Bans',
 				value: 'getBans',
-				action: 'Get guild bans',
+				action: 'Get bans',
 				routing: {
 					request: {
 						method: 'GET',
@@ -159,7 +159,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Get Ban',
 				value: 'getBan',
-				action: 'Get a guild ban',
+				action: 'Get ban',
 				routing: {
 					request: {
 						method: 'GET',
@@ -170,7 +170,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Create Ban',
 				value: 'createBan',
-				action: 'Create a guild ban',
+				action: 'Create ban',
 				routing: {
 					request: {
 						method: 'PUT',
@@ -182,7 +182,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Remove Ban',
 				value: 'removeBan',
-				action: 'Remove a guild ban',
+				action: 'Remove ban',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -203,7 +203,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Get Prune Count',
 				value: 'getPruneCount',
-				action: 'Get guild prune count',
+				action: 'Get prune count',
 				routing: {
 					request: {
 						method: 'GET',
@@ -214,7 +214,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Begin Prune',
 				value: 'beginPrune',
-				action: 'Begin a guild prune',
+				action: 'Begin prune',
 				routing: {
 					request: {
 						method: 'POST',
@@ -226,7 +226,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Get Voice Regions',
 				value: 'getVoiceRegions',
-				action: 'Get guild voice regions',
+				action: 'Get voice regions',
 				routing: {
 					request: {
 						method: 'GET',
@@ -237,7 +237,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Get Invites',
 				value: 'getInvites',
-				action: 'Get guild invites',
+				action: 'Get invites',
 				routing: {
 					request: {
 						method: 'GET',
@@ -248,7 +248,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Get Integrations',
 				value: 'getIntegrations',
-				action: 'Get guild integrations',
+				action: 'Get integrations',
 				routing: {
 					request: {
 						method: 'GET',
@@ -259,7 +259,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Delete Integration',
 				value: 'deleteIntegration',
-				action: 'Delete a guild integration',
+				action: 'Delete integration',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -280,7 +280,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Get Widget Settings',
 				value: 'getWidgetSettings',
-				action: 'Get guild widget settings',
+				action: 'Get widget settings',
 				routing: {
 					request: {
 						method: 'GET',
@@ -291,7 +291,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Modify Widget',
 				value: 'modifyWidget',
-				action: 'Modify the guild widget',
+				action: 'Modify widget',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -303,7 +303,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Get Widget',
 				value: 'getWidget',
-				action: 'Get the guild widget',
+				action: 'Get widget',
 				routing: {
 					request: {
 						method: 'GET',
@@ -314,7 +314,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Get Vanity URL',
 				value: 'getVanityUrl',
-				action: 'Get the guild vanity URL',
+				action: 'Get vanity url',
 				routing: {
 					request: {
 						method: 'GET',
@@ -325,7 +325,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Get Widget Image',
 				value: 'getWidgetImage',
-				action: 'Get the guild widget image',
+				action: 'Get widget image',
 				routing: {
 					request: {
 						method: 'GET',
@@ -336,7 +336,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Get Welcome Screen',
 				value: 'getWelcomeScreen',
-				action: 'Get the guild welcome screen',
+				action: 'Get welcome screen',
 				routing: {
 					request: {
 						method: 'GET',
@@ -347,7 +347,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Modify Welcome Screen',
 				value: 'modifyWelcomeScreen',
-				action: 'Modify the guild welcome screen',
+				action: 'Modify welcome screen',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -359,7 +359,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Get Onboarding',
 				value: 'getOnboarding',
-				action: 'Get the guild onboarding',
+				action: 'Get onboarding',
 				routing: {
 					request: {
 						method: 'GET',
@@ -370,7 +370,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Modify Onboarding',
 				value: 'modifyOnboarding',
-				action: 'Modify the guild onboarding',
+				action: 'Modify onboarding',
 				routing: {
 					request: {
 						method: 'PUT',
@@ -382,7 +382,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Modify Current User Voice State',
 				value: 'modifyCurrentUserVoiceState',
-				action: 'Modify the current user voice state',
+				action: 'Modify current user voice state',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -394,7 +394,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Modify User Voice State',
 				value: 'modifyUserVoiceState',
-				action: 'Modify a user voice state',
+				action: 'Modify user voice state',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -406,7 +406,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'Search Members',
 				value: 'searchMembers',
-				action: 'Search guild members',
+				action: 'Search members',
 				routing: {
 					request: {
 						method: 'GET',
@@ -417,7 +417,7 @@ export const guildOperations: INodeProperties[] = [
 			{
 				name: 'List Members',
 				value: 'listMembers',
-				action: 'List guild members',
+				action: 'List members',
 				routing: {
 					request: {
 						method: 'GET',

@@ -19,7 +19,7 @@ export const applicationRoleConnectionMetadataOperations: INodeProperties[] = [
 			{
 				name: 'Get Records',
 				value: 'getRecords',
-				action: 'Get application role connection metadata records',
+				action: 'Get records',
 				routing: {
 					request: {
 						method: 'GET',
@@ -30,7 +30,7 @@ export const applicationRoleConnectionMetadataOperations: INodeProperties[] = [
 			{
 				name: 'Update Records',
 				value: 'updateRecords',
-				action: 'Update application role connection metadata records',
+				action: 'Update records',
 				routing: {
 					request: {
 						method: 'PUT',

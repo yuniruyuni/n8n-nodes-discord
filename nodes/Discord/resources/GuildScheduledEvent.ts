@@ -51,7 +51,7 @@ export const guildScheduledEventOperations: INodeProperties[] = [
 			{
 				name: 'List',
 				value: 'list',
-				action: 'List guild scheduled events',
+				action: 'List',
 				routing: {
 					request: {
 						method: 'GET',
@@ -62,7 +62,7 @@ export const guildScheduledEventOperations: INodeProperties[] = [
 			{
 				name: 'Create',
 				value: 'create',
-				action: 'Create a guild scheduled event',
+				action: 'Create',
 				routing: {
 					send: {
 						preSend: [presendGuildScheduledEventImage],
@@ -77,7 +77,7 @@ export const guildScheduledEventOperations: INodeProperties[] = [
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get a guild scheduled event',
+				action: 'Get',
 				routing: {
 					request: {
 						method: 'GET',
@@ -88,7 +88,7 @@ export const guildScheduledEventOperations: INodeProperties[] = [
 			{
 				name: 'Modify',
 				value: 'modify',
-				action: 'Modify a guild scheduled event',
+				action: 'Modify',
 				routing: {
 					send: {
 						preSend: [presendGuildScheduledEventImage],
@@ -103,7 +103,7 @@ export const guildScheduledEventOperations: INodeProperties[] = [
 			{
 				name: 'Delete',
 				value: 'delete',
-				action: 'Delete a guild scheduled event',
+				action: 'Delete',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -124,7 +124,7 @@ export const guildScheduledEventOperations: INodeProperties[] = [
 			{
 				name: 'List Users',
 				value: 'listUsers',
-				action: 'List guild scheduled event users',
+				action: 'List users',
 				routing: {
 					request: {
 						method: 'GET',

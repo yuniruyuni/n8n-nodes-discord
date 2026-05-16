@@ -23,7 +23,7 @@ export const stageInstanceOperations: INodeProperties[] = [
 			{
 				name: 'Create',
 				value: 'create',
-				action: 'Create a stage instance',
+				action: 'Create',
 				routing: {
 					request: {
 						method: 'POST',
@@ -35,7 +35,7 @@ export const stageInstanceOperations: INodeProperties[] = [
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get a stage instance',
+				action: 'Get',
 				routing: {
 					request: {
 						method: 'GET',
@@ -46,7 +46,7 @@ export const stageInstanceOperations: INodeProperties[] = [
 			{
 				name: 'Modify',
 				value: 'modify',
-				action: 'Modify a stage instance',
+				action: 'Modify',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -58,7 +58,7 @@ export const stageInstanceOperations: INodeProperties[] = [
 			{
 				name: 'Delete',
 				value: 'delete',
-				action: 'Delete a stage instance',
+				action: 'Delete',
 				routing: {
 					request: {
 						method: 'DELETE',

@@ -92,7 +92,7 @@ export const auditLogOperations: INodeProperties[] = [
 			{
 				name: 'Get Guild Audit Log',
 				value: 'getGuildAuditLog',
-				action: 'Get a guild audit log',
+				action: 'Get guild audit log',
 				routing: {
 					request: {
 						method: 'GET',

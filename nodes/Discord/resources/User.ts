@@ -67,7 +67,7 @@ export const userOperations: INodeProperties[] = [
 			{
 				name: 'Get Current',
 				value: 'getCurrent',
-				action: 'Get current bot user',
+				action: 'Get current',
 				routing: {
 					request: {
 						method: 'GET',
@@ -78,7 +78,7 @@ export const userOperations: INodeProperties[] = [
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get a user',
+				action: 'Get',
 				routing: {
 					request: {
 						method: 'GET',
@@ -89,7 +89,7 @@ export const userOperations: INodeProperties[] = [
 			{
 				name: 'Modify Current',
 				value: 'modifyCurrent',
-				action: 'Modify the current user',
+				action: 'Modify current',
 				routing: {
 					send: {
 						preSend: [presendUserModifyCurrent],
@@ -104,7 +104,7 @@ export const userOperations: INodeProperties[] = [
 			{
 				name: 'Get Current Guilds',
 				value: 'getCurrentGuilds',
-				action: 'Get the current user guilds',
+				action: 'Get current guilds',
 				routing: {
 					request: {
 						method: 'GET',
@@ -115,7 +115,7 @@ export const userOperations: INodeProperties[] = [
 			{
 				name: 'Get Current Guild Member',
 				value: 'getCurrentGuildMember',
-				action: 'Get the current user guild member',
+				action: 'Get current guild member',
 				routing: {
 					request: {
 						method: 'GET',
@@ -126,7 +126,7 @@ export const userOperations: INodeProperties[] = [
 			{
 				name: 'Leave Guild',
 				value: 'leaveGuild',
-				action: 'Leave a guild as the current user',
+				action: 'Leave guild',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -147,7 +147,7 @@ export const userOperations: INodeProperties[] = [
 			{
 				name: 'Create DM',
 				value: 'createDm',
-				action: 'Create a DM channel with a user',
+				action: 'Create DM',
 				routing: {
 					request: {
 						method: 'POST',
@@ -159,7 +159,7 @@ export const userOperations: INodeProperties[] = [
 			{
 				name: 'Create Group DM',
 				value: 'createGroupDm',
-				action: 'Create a group DM channel',
+				action: 'Create group dm',
 				description: 'Requires OAuth2 user token; not supported with bot tokens',
 				routing: {
 					request: {
@@ -172,7 +172,7 @@ export const userOperations: INodeProperties[] = [
 			{
 				name: 'Get Current Connections',
 				value: 'getCurrentConnections',
-				action: 'Get the current user connections',
+				action: 'Get current connections',
 				description: 'Requires OAuth2 user token; not supported with bot tokens',
 				routing: {
 					request: {
@@ -184,7 +184,7 @@ export const userOperations: INodeProperties[] = [
 			{
 				name: 'Get Current Application Role Connection',
 				value: 'getCurrentApplicationRoleConnection',
-				action: 'Get the current user application role connection',
+				action: 'Get current application role connection',
 				description: 'Requires OAuth2 user token; not supported with bot tokens',
 				routing: {
 					request: {
@@ -196,7 +196,7 @@ export const userOperations: INodeProperties[] = [
 			{
 				name: 'Update Current Application Role Connection',
 				value: 'updateCurrentApplicationRoleConnection',
-				action: 'Update the current user application role connection',
+				action: 'Update current application role connection',
 				description: 'Requires OAuth2 user token; not supported with bot tokens',
 				routing: {
 					request: {

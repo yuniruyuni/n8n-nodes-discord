@@ -15,7 +15,7 @@ export const inviteOperations: INodeProperties[] = [
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get an invite',
+				action: 'Get',
 				routing: {
 					request: {
 						method: 'GET',
@@ -26,7 +26,7 @@ export const inviteOperations: INodeProperties[] = [
 			{
 				name: 'Delete',
 				value: 'delete',
-				action: 'Delete an invite',
+				action: 'Delete',
 				routing: {
 					request: {
 						method: 'DELETE',

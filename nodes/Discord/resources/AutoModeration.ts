@@ -343,7 +343,7 @@ export const autoModerationOperations: INodeProperties[] = [
 			{
 				name: 'List Rules',
 				value: 'listRules',
-				action: 'List auto moderation rules',
+				action: 'List rules',
 				routing: {
 					request: {
 						method: 'GET',
@@ -354,7 +354,7 @@ export const autoModerationOperations: INodeProperties[] = [
 			{
 				name: 'Get Rule',
 				value: 'getRule',
-				action: 'Get an auto moderation rule',
+				action: 'Get rule',
 				routing: {
 					request: {
 						method: 'GET',
@@ -365,7 +365,7 @@ export const autoModerationOperations: INodeProperties[] = [
 			{
 				name: 'Create Rule',
 				value: 'createRule',
-				action: 'Create an auto moderation rule',
+				action: 'Create rule',
 				routing: {
 					send: {
 						preSend: [presendAutoModerationCreateRule],
@@ -379,7 +379,7 @@ export const autoModerationOperations: INodeProperties[] = [
 			{
 				name: 'Modify Rule',
 				value: 'modifyRule',
-				action: 'Modify an auto moderation rule',
+				action: 'Modify rule',
 				routing: {
 					send: {
 						preSend: [presendAutoModerationModifyRule],
@@ -393,7 +393,7 @@ export const autoModerationOperations: INodeProperties[] = [
 			{
 				name: 'Delete Rule',
 				value: 'deleteRule',
-				action: 'Delete an auto moderation rule',
+				action: 'Delete rule',
 				routing: {
 					request: {
 						method: 'DELETE',

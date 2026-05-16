@@ -18,7 +18,7 @@ export const roleOperations: INodeProperties[] = [
 			{
 				name: 'Create',
 				value: 'create',
-				action: 'Create a guild role',
+				action: 'Create',
 				routing: {
 					request: {
 						method: 'POST',
@@ -30,7 +30,7 @@ export const roleOperations: INodeProperties[] = [
 			{
 				name: 'Get Many',
 				value: 'getAll',
-				action: 'Get many guild roles',
+				action: 'Get many',
 				routing: {
 					request: {
 						method: 'GET',
@@ -41,7 +41,7 @@ export const roleOperations: INodeProperties[] = [
 			{
 				name: 'Modify',
 				value: 'modify',
-				action: 'Modify a guild role',
+				action: 'Modify',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -53,7 +53,7 @@ export const roleOperations: INodeProperties[] = [
 			{
 				name: 'Delete',
 				value: 'delete',
-				action: 'Delete a guild role',
+				action: 'Delete',
 				routing: {
 					request: {
 						method: 'DELETE',

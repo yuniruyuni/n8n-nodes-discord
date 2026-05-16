@@ -67,7 +67,7 @@ export const emojiOperations: INodeProperties[] = [
 			{
 				name: 'Get Guild Emoji',
 				value: 'getGuildEmoji',
-				action: 'Get a guild emoji',
+				action: 'Get guild emoji',
 				routing: {
 					request: {
 						method: 'GET',
@@ -78,7 +78,7 @@ export const emojiOperations: INodeProperties[] = [
 			{
 				name: 'Create Guild Emoji',
 				value: 'createGuildEmoji',
-				action: 'Create a guild emoji',
+				action: 'Create guild emoji',
 				routing: {
 					send: {
 						preSend: [presendEmojiImage],
@@ -93,7 +93,7 @@ export const emojiOperations: INodeProperties[] = [
 			{
 				name: 'Modify Guild Emoji',
 				value: 'modifyGuildEmoji',
-				action: 'Modify a guild emoji',
+				action: 'Modify guild emoji',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -105,7 +105,7 @@ export const emojiOperations: INodeProperties[] = [
 			{
 				name: 'Delete Guild Emoji',
 				value: 'deleteGuildEmoji',
-				action: 'Delete a guild emoji',
+				action: 'Delete guild emoji',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -137,7 +137,7 @@ export const emojiOperations: INodeProperties[] = [
 			{
 				name: 'Get Application Emoji',
 				value: 'getApplicationEmoji',
-				action: 'Get an application emoji',
+				action: 'Get application emoji',
 				routing: {
 					request: {
 						method: 'GET',
@@ -148,7 +148,7 @@ export const emojiOperations: INodeProperties[] = [
 			{
 				name: 'Create Application Emoji',
 				value: 'createApplicationEmoji',
-				action: 'Create an application emoji',
+				action: 'Create application emoji',
 				routing: {
 					send: {
 						preSend: [presendEmojiImage],
@@ -163,7 +163,7 @@ export const emojiOperations: INodeProperties[] = [
 			{
 				name: 'Modify Application Emoji',
 				value: 'modifyApplicationEmoji',
-				action: 'Modify an application emoji',
+				action: 'Modify application emoji',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -175,7 +175,7 @@ export const emojiOperations: INodeProperties[] = [
 			{
 				name: 'Delete Application Emoji',
 				value: 'deleteApplicationEmoji',
-				action: 'Delete an application emoji',
+				action: 'Delete application emoji',
 				routing: {
 					request: {
 						method: 'DELETE',

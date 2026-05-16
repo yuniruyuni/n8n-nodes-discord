@@ -92,7 +92,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get a channel',
+				action: 'Get',
 				routing: {
 					request: {
 						method: 'GET',
@@ -103,7 +103,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Modify',
 				value: 'modify',
-				action: 'Modify a channel',
+				action: 'Modify',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -115,7 +115,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Delete',
 				value: 'delete',
-				action: 'Delete a channel',
+				action: 'Delete',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -126,7 +126,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Trigger Typing',
 				value: 'triggerTyping',
-				action: 'Trigger typing indicator in a channel',
+				action: 'Trigger typing',
 				routing: {
 					request: {
 						method: 'POST',
@@ -147,7 +147,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Get Pinned Messages',
 				value: 'getPinnedMessages',
-				action: 'Get pinned messages in a channel',
+				action: 'Get pinned messages',
 				routing: {
 					request: {
 						method: 'GET',
@@ -158,7 +158,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Pin Message',
 				value: 'pinMessage',
-				action: 'Pin a message in a channel',
+				action: 'Pin message',
 				routing: {
 					request: {
 						method: 'PUT',
@@ -179,7 +179,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Unpin Message',
 				value: 'unpinMessage',
-				action: 'Unpin a message in a channel',
+				action: 'Unpin message',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -200,7 +200,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Create Reaction',
 				value: 'createReaction',
-				action: 'Create a reaction on a message as the current user',
+				action: 'Create reaction',
 				routing: {
 					request: {
 						method: 'PUT',
@@ -221,7 +221,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Delete Own Reaction',
 				value: 'deleteOwnReaction',
-				action: 'Delete the current user reaction from a message',
+				action: 'Delete own reaction',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -242,7 +242,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Delete User Reaction',
 				value: 'deleteUserReaction',
-				action: 'Delete another user reaction from a message',
+				action: 'Delete user reaction',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -263,7 +263,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Get Reactions',
 				value: 'getReactions',
-				action: 'Get users that reacted with a specific emoji',
+				action: 'Get reactions',
 				routing: {
 					request: {
 						method: 'GET',
@@ -274,7 +274,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Delete All Reactions',
 				value: 'deleteAllReactions',
-				action: 'Delete all reactions on a message',
+				action: 'Delete all reactions',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -295,7 +295,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Delete All Reactions For Emoji',
 				value: 'deleteAllReactionsForEmoji',
-				action: 'Delete all reactions for a specific emoji on a message',
+				action: 'Delete all reactions for emoji',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -316,7 +316,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Bulk Delete Messages',
 				value: 'bulkDeleteMessages',
-				action: 'Bulk delete messages in a channel',
+				action: 'Bulk delete messages',
 				routing: {
 					request: {
 						method: 'POST',
@@ -338,7 +338,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Crosspost Message',
 				value: 'crosspostMessage',
-				action: 'Crosspost a message in an announcement channel',
+				action: 'Crosspost message',
 				routing: {
 					request: {
 						method: 'POST',
@@ -349,7 +349,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Edit Channel Permissions',
 				value: 'editChannelPermissions',
-				action: 'Edit channel permission overwrites',
+				action: 'Edit channel permissions',
 				routing: {
 					send: {
 						preSend: [presendEditChannelPermissions],
@@ -373,7 +373,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Delete Channel Permission',
 				value: 'deleteChannelPermission',
-				action: 'Delete a channel permission overwrite',
+				action: 'Delete channel permission',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -394,7 +394,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Get Channel Invites',
 				value: 'getChannelInvites',
-				action: 'Get invites for a channel',
+				action: 'Get channel invites',
 				routing: {
 					request: {
 						method: 'GET',
@@ -405,7 +405,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Create Channel Invite',
 				value: 'createChannelInvite',
-				action: 'Create an invite for a channel',
+				action: 'Create channel invite',
 				routing: {
 					request: {
 						method: 'POST',
@@ -417,7 +417,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Follow Announcement Channel',
 				value: 'followAnnouncementChannel',
-				action: 'Follow an announcement channel',
+				action: 'Follow announcement channel',
 				routing: {
 					request: {
 						method: 'POST',
@@ -429,7 +429,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Group DM Add Recipient',
 				value: 'groupDmAddRecipient',
-				action: 'Add a recipient to a group DM',
+				action: 'Group dm add recipient',
 				routing: {
 					request: {
 						method: 'PUT',
@@ -441,7 +441,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Group DM Remove Recipient',
 				value: 'groupDmRemoveRecipient',
-				action: 'Remove a recipient from a group DM',
+				action: 'Group dm remove recipient',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -462,7 +462,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Start Thread From Message',
 				value: 'startThreadFromMessage',
-				action: 'Start a thread from an existing message',
+				action: 'Start thread from message',
 				routing: {
 					request: {
 						method: 'POST',
@@ -474,7 +474,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Start Thread Without Message',
 				value: 'startThreadWithoutMessage',
-				action: 'Start a thread that is not connected to a message',
+				action: 'Start thread without message',
 				routing: {
 					request: {
 						method: 'POST',
@@ -486,7 +486,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Start Thread In Forum Channel',
 				value: 'startThreadInForumChannel',
-				action: 'Start a thread in a forum channel',
+				action: 'Start thread in forum channel',
 				routing: {
 					request: {
 						method: 'POST',
@@ -498,7 +498,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Join Thread',
 				value: 'joinThread',
-				action: 'Join a thread as the current user',
+				action: 'Join thread',
 				routing: {
 					request: {
 						method: 'PUT',
@@ -519,7 +519,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Add Thread Member',
 				value: 'addThreadMember',
-				action: 'Add another member to a thread',
+				action: 'Add thread member',
 				routing: {
 					request: {
 						method: 'PUT',
@@ -540,7 +540,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Leave Thread',
 				value: 'leaveThread',
-				action: 'Leave a thread as the current user',
+				action: 'Leave thread',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -561,7 +561,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Remove Thread Member',
 				value: 'removeThreadMember',
-				action: 'Remove another member from a thread',
+				action: 'Remove thread member',
 				routing: {
 					request: {
 						method: 'DELETE',
@@ -582,7 +582,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'Get Thread Member',
 				value: 'getThreadMember',
-				action: 'Get a thread member',
+				action: 'Get thread member',
 				routing: {
 					request: {
 						method: 'GET',
@@ -593,7 +593,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'List Thread Members',
 				value: 'listThreadMembers',
-				action: 'List members of a thread',
+				action: 'List thread members',
 				routing: {
 					request: {
 						method: 'GET',
@@ -604,7 +604,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'List Public Archived Threads',
 				value: 'listPublicArchivedThreads',
-				action: 'List public archived threads in a channel',
+				action: 'List public archived threads',
 				routing: {
 					request: {
 						method: 'GET',
@@ -615,7 +615,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'List Private Archived Threads',
 				value: 'listPrivateArchivedThreads',
-				action: 'List private archived threads in a channel',
+				action: 'List private archived threads',
 				routing: {
 					request: {
 						method: 'GET',
@@ -626,7 +626,7 @@ export const channelOperations: INodeProperties[] = [
 			{
 				name: 'List Joined Private Archived Threads',
 				value: 'listJoinedPrivateArchivedThreads',
-				action: 'List joined private archived threads in a channel',
+				action: 'List joined private archived threads',
 				routing: {
 					request: {
 						method: 'GET',

@@ -63,7 +63,7 @@ export const stickerOperations: INodeProperties[] = [
 			{
 				name: 'Get Sticker',
 				value: 'getSticker',
-				action: 'Get a sticker',
+				action: 'Get sticker',
 				routing: {
 					request: {
 						method: 'GET',
@@ -74,7 +74,7 @@ export const stickerOperations: INodeProperties[] = [
 			{
 				name: 'List Sticker Packs',
 				value: 'listStickerPacks',
-				action: 'List nitro sticker packs',
+				action: 'List sticker packs',
 				routing: {
 					request: {
 						method: 'GET',
@@ -96,7 +96,7 @@ export const stickerOperations: INodeProperties[] = [
 			{
 				name: 'Get Guild Sticker',
 				value: 'getGuildSticker',
-				action: 'Get a guild sticker',
+				action: 'Get guild sticker',
 				routing: {
 					request: {
 						method: 'GET',
@@ -107,7 +107,7 @@ export const stickerOperations: INodeProperties[] = [
 			{
 				name: 'Create Guild Sticker',
 				value: 'createGuildSticker',
-				action: 'Create a guild sticker',
+				action: 'Create guild sticker',
 				routing: {
 					send: {
 						preSend: [presendCreateGuildSticker],
@@ -121,7 +121,7 @@ export const stickerOperations: INodeProperties[] = [
 			{
 				name: 'Modify Guild Sticker',
 				value: 'modifyGuildSticker',
-				action: 'Modify a guild sticker',
+				action: 'Modify guild sticker',
 				routing: {
 					request: {
 						method: 'PATCH',
@@ -133,7 +133,7 @@ export const stickerOperations: INodeProperties[] = [
 			{
 				name: 'Delete Guild Sticker',
 				value: 'deleteGuildSticker',
-				action: 'Delete a guild sticker',
+				action: 'Delete guild sticker',
 				routing: {
 					request: {
 						method: 'DELETE',

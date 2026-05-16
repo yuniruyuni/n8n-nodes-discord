@@ -17,7 +17,7 @@ export const pollOperations: INodeProperties[] = [
 			{
 				name: 'Get Answer Voters',
 				value: 'getAnswerVoters',
-				action: 'Get users that voted for a poll answer',
+				action: 'Get answer voters',
 				routing: {
 					request: {
 						method: 'GET',
@@ -28,7 +28,7 @@ export const pollOperations: INodeProperties[] = [
 			{
 				name: 'End Poll',
 				value: 'endPoll',
-				action: 'Immediately end a poll',
+				action: 'End poll',
 				routing: {
 					request: {
 						method: 'POST',

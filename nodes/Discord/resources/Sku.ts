@@ -17,7 +17,7 @@ export const skuOperations: INodeProperties[] = [
 			{
 				name: 'List',
 				value: 'list',
-				action: 'List skus',
+				action: 'List',
 				routing: {
 					request: {
 						method: 'GET',

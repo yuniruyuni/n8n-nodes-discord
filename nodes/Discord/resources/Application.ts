@@ -54,7 +54,7 @@ export const applicationOperations: INodeProperties[] = [
 			{
 				name: 'Get Current',
 				value: 'getCurrent',
-				action: 'Get the current application',
+				action: 'Get current',
 				routing: {
 					request: {
 						method: 'GET',
@@ -65,7 +65,7 @@ export const applicationOperations: INodeProperties[] = [
 			{
 				name: 'Edit Current',
 				value: 'editCurrent',
-				action: 'Edit the current application',
+				action: 'Edit current',
 				routing: {
 					send: {
 						preSend: [presendApplicationEditCurrent],
@@ -79,7 +79,7 @@ export const applicationOperations: INodeProperties[] = [
 			{
 				name: 'Get Activity Instance',
 				value: 'getActivityInstance',
-				action: 'Get an application activity instance',
+				action: 'Get activity instance',
 				routing: {
 					request: {
 						method: 'GET',
