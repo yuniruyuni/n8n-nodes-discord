@@ -113,6 +113,11 @@ export class GatewayWebSocket {
 		this.closing = true;
 		this.stopHeartbeat();
 		if (this.ws) {
+			// Detach handlers so any in-flight events from the still-open socket
+			// during the closing handshake are dropped rather than processed.
+			this.ws.onmessage = null;
+			this.ws.onerror = null;
+			this.ws.onclose = null;
 			this.ws.close();
 			this.ws = null;
 		}
@@ -140,6 +145,10 @@ export class GatewayWebSocket {
 		options: GatewayIdentifyOptions,
 		resolve: () => void,
 	): void {
+		if (this.closing) {
+			return;
+		}
+
 		const op = payload.op as number;
 
 		if (typeof payload.s === 'number') {
