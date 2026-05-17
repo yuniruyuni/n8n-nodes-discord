@@ -86,6 +86,19 @@ export class DiscordGatewayConnection {
 			return;
 		}
 
+		if (eventName === 'MESSAGE_CREATE' || eventName === 'MESSAGE_UPDATE') {
+			const includeBotMessages = this.trigger.getNodeParameter(
+				'includeBotMessages',
+				false,
+			) as boolean;
+			if (!includeBotMessages) {
+				const author = data.author as IDataObject | undefined;
+				if (author?.bot === true || data.webhook_id || author?.system === true) {
+					return;
+				}
+			}
+		}
+
 		const emitRawPayload = this.trigger.getNodeParameter('emitRawPayload') as boolean;
 		this.onEvent(
 			emitRawPayload

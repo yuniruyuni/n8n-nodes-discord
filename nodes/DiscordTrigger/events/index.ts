@@ -144,6 +144,19 @@ export const triggerProperties: INodeProperties[] = [
 			'Gateway intents to send with Identify. Privileged intents (MESSAGE_CONTENT, GUILD_MEMBERS, GUILD_PRESENCES) must be enabled in the Discord Developer Portal or Discord closes the connection with code 4014.',
 	},
 	{
+		displayName: 'Include Bot Messages',
+		name: 'includeBotMessages',
+		type: 'boolean',
+		default: false,
+		displayOptions: {
+			show: {
+				event: ['MESSAGE_CREATE', 'MESSAGE_UPDATE', '*'],
+			},
+		},
+		description:
+			'Whether to emit messages authored by bots (including this bot), webhooks, or Discord system. Default off prevents infinite loops when this workflow also sends messages. Only applies to MESSAGE_CREATE and MESSAGE_UPDATE events.',
+	},
+	{
 		displayName: 'Emit Raw Gateway Payload',
 		name: 'emitRawPayload',
 		type: 'boolean',
