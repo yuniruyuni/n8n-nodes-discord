@@ -11,6 +11,14 @@ import { DiscordGatewayConnection } from './DiscordGatewayConnection';
 import { triggerProperties } from './events';
 import { registerGatewaySender, unregisterGatewaySender } from './gatewaySendBus';
 
+// Module-level registry of active connections keyed by workflow + node id.
+// Defensive cleanup for cases where n8n's lifecycle does not invoke
+// closeFunction before re-running trigger() (workflow re-activation, hot
+// reload during dev, etc.). Without this, the previous WebSocket stays open
+// and Discord continues delivering events to it in parallel with the new one,
+// causing duplicate emits that accumulate per re-activation.
+const activeConnections = new Map<string, DiscordGatewayConnection>();
+
 export class DiscordTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Discord Trigger',
@@ -57,6 +65,19 @@ export class DiscordTrigger implements INodeType {
 		const event = this.getNodeParameter('event') as string;
 		const connectionName = (this.getNodeParameter('connectionName', 'default') as string) || 'default';
 
+		const workflowId = this.getWorkflow().id ?? '';
+		const nodeName = this.getNode().name;
+		const registryKey = `${workflowId}:${nodeName}`;
+
+		// If a previous activation of this same node left a connection behind
+		// (n8n did not call closeFunction before reactivating), tear it down
+		// before creating a new one.
+		const stale = activeConnections.get(registryKey);
+		if (stale) {
+			activeConnections.delete(registryKey);
+			await stale.close();
+		}
+
 		const onEvent = (eventData: IDataObject) => {
 			this.emit([this.helpers.returnJsonArray([eventData])]);
 		};
@@ -64,12 +85,16 @@ export class DiscordTrigger implements INodeType {
 		const connection = new DiscordGatewayConnection(this, event, onEvent);
 		await connection.connect();
 
+		activeConnections.set(registryKey, connection);
 		registerGatewaySender(connectionName, (payload) => connection.sendCommand(payload));
 
 		return {
 			closeFunction: async () => {
 				unregisterGatewaySender(connectionName);
-				connection.close();
+				if (activeConnections.get(registryKey) === connection) {
+					activeConnections.delete(registryKey);
+				}
+				await connection.close();
 			},
 		};
 	}

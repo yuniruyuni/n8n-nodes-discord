@@ -109,18 +109,50 @@ export class GatewayWebSocket {
 		});
 	}
 
-	close(): void {
+	async close(): Promise<void> {
 		this.closing = true;
 		this.stopHeartbeat();
-		if (this.ws) {
-			// Detach handlers so any in-flight events from the still-open socket
-			// during the closing handshake are dropped rather than processed.
-			this.ws.onmessage = null;
-			this.ws.onerror = null;
-			this.ws.onclose = null;
-			this.ws.close();
-			this.ws = null;
+		const ws = this.ws;
+		this.ws = null;
+		if (!ws) {
+			return;
 		}
+
+		// Drop event/payload handling immediately so any frames in flight during
+		// the closing handshake do not reach handlePayload / onEvent.
+		ws.onmessage = null;
+		ws.onerror = null;
+
+		// Resolve only after the underlying WebSocket has actually transitioned
+		// to CLOSED. n8n awaits closeFunction; this guarantees the runtime sees a
+		// fully terminated connection before any subsequent re-activation.
+		await new Promise<void>((resolve) => {
+			let settled = false;
+			const finish = () => {
+				if (settled) return;
+				settled = true;
+				ws.onclose = null;
+				resolve();
+			};
+
+			if (ws.readyState === WebSocket.CLOSED) {
+				finish();
+				return;
+			}
+
+			ws.onclose = finish;
+
+			try {
+				ws.close();
+			} catch {
+				finish();
+				return;
+			}
+
+			// Safety: do not block n8n's closeFunction indefinitely if Discord
+			// or the network never returns the close-frame ack.
+			void sleep(5000).then(finish);
+		});
 	}
 
 	getSessionState(): IDataObject {
@@ -173,7 +205,7 @@ export class GatewayWebSocket {
 		}
 
 		if (op === OPCODE_RECONNECT) {
-			this.close();
+			void this.close();
 			this.onDisconnect(this.sessionId !== null);
 			return;
 		}
@@ -241,7 +273,7 @@ export class GatewayWebSocket {
 					workflowId: this.workflowId,
 					nodeType: 'n8n-nodes-discord.discordTrigger',
 				});
-				this.close();
+				void this.close();
 				this.onDisconnect(this.sessionId !== null);
 				return;
 			}

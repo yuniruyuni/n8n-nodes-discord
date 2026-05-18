@@ -41,11 +41,12 @@ export class DiscordGatewayConnection {
 		this.persistSessionState();
 	}
 
-	close(): void {
+	async close(): Promise<void> {
 		this.closing = true;
-		if (this.ws) {
-			this.ws.close();
+		const ws = this.ws;
+		if (ws) {
 			this.persistSessionState();
+			await ws.close();
 		}
 	}
 
