@@ -46,7 +46,7 @@ import {
 	type DiscordComponent,
 } from '../shared/components';
 import { parseOptionalJsonField, createRawJsonField } from '../shared/messagePayload';
-import { successOutput } from '../shared/routing';
+import { createOperationSelector, defineDiscordRestOperation } from '../shared/operation';
 
 const INTERACTION_CALLBACK_TYPE = {
 	CHANNEL_MESSAGE_WITH_SOURCE: 4,
@@ -418,122 +418,74 @@ const messageFieldOperations = [
 const messageFollowupOps = ['editOriginalResponse', 'createFollowupMessage', 'editFollowupMessage'];
 
 export const interactionResponseOperations: INodeProperties[] = [
-	{
-		displayName: 'Operation',
-		name: 'operation',
-		type: 'options',
-		noDataExpression: true,
-		displayOptions: {
-			show: {
-				resource: ['interactionResponse'],
-			},
-		},
-		options: [
-			{
+	createOperationSelector(
+		'interactionResponse',
+		[
+			defineDiscordRestOperation({
 				name: 'Create Followup Message',
 				value: 'createFollowupMessage',
 				action: 'Create followup message',
-				routing: {
-					send: {
-						preSend: [presendCreateFollowup],
-					},
-					request: {
-						method: 'POST',
-						url: '=/webhooks/{{$parameter.applicationId}}/{{$parameter.interactionToken}}',
-					},
-				},
-			},
-			{
+				method: 'POST',
+				url: '=/webhooks/{{$parameter.applicationId}}/{{$parameter.interactionToken}}',
+				preSend: [presendCreateFollowup],
+			}),
+			defineDiscordRestOperation({
 				name: 'Create Initial Callback',
 				value: 'createInitialCallback',
 				action: 'Create initial callback',
-				routing: {
-					send: {
-						preSend: [presendInitialCallback],
-					},
-					request: {
-						method: 'POST',
-						url: '=/interactions/{{$parameter.interactionId}}/{{$parameter.interactionToken}}/callback',
-					},
-				},
-			},
-			{
+				method: 'POST',
+				url: '=/interactions/{{$parameter.interactionId}}/{{$parameter.interactionToken}}/callback',
+				preSend: [presendInitialCallback],
+			}),
+			defineDiscordRestOperation({
 				name: 'Delete Followup Message',
 				value: 'deleteFollowupMessage',
 				action: 'Delete followup message',
-				routing: {
-					request: {
-						method: 'DELETE',
-						url: '=/webhooks/{{$parameter.applicationId}}/{{$parameter.interactionToken}}/messages/{{$parameter.messageId}}',
-					},
-					output: successOutput,
-				},
-			},
-			{
+				method: 'DELETE',
+				url: '=/webhooks/{{$parameter.applicationId}}/{{$parameter.interactionToken}}/messages/{{$parameter.messageId}}',
+				successOutput: true,
+			}),
+			defineDiscordRestOperation({
 				name: 'Delete Original Response',
 				value: 'deleteOriginalResponse',
 				action: 'Delete original response',
-				routing: {
-					request: {
-						method: 'DELETE',
-						url: '=/webhooks/{{$parameter.applicationId}}/{{$parameter.interactionToken}}/messages/@original',
-					},
-					output: successOutput,
-				},
-			},
-			{
+				method: 'DELETE',
+				url: '=/webhooks/{{$parameter.applicationId}}/{{$parameter.interactionToken}}/messages/@original',
+				successOutput: true,
+			}),
+			defineDiscordRestOperation({
 				name: 'Edit Followup Message',
 				value: 'editFollowupMessage',
 				action: 'Edit followup message',
-				routing: {
-					send: {
-						preSend: [presendEditMessage],
-					},
-					request: {
-						method: 'PATCH',
-						url: '=/webhooks/{{$parameter.applicationId}}/{{$parameter.interactionToken}}/messages/{{$parameter.messageId}}',
-					},
-				},
-			},
-			{
+				method: 'PATCH',
+				url: '=/webhooks/{{$parameter.applicationId}}/{{$parameter.interactionToken}}/messages/{{$parameter.messageId}}',
+				preSend: [presendEditMessage],
+			}),
+			defineDiscordRestOperation({
 				name: 'Edit Original Response',
 				value: 'editOriginalResponse',
 				action: 'Edit original response',
-				routing: {
-					send: {
-						preSend: [presendEditMessage],
-					},
-					request: {
-						method: 'PATCH',
-						url: '=/webhooks/{{$parameter.applicationId}}/{{$parameter.interactionToken}}/messages/@original',
-					},
-				},
-			},
-			{
+				method: 'PATCH',
+				url: '=/webhooks/{{$parameter.applicationId}}/{{$parameter.interactionToken}}/messages/@original',
+				preSend: [presendEditMessage],
+			}),
+			defineDiscordRestOperation({
 				name: 'Get Followup Message',
 				value: 'getFollowupMessage',
 				action: 'Get followup message',
-				routing: {
-					request: {
-						method: 'GET',
-						url: '=/webhooks/{{$parameter.applicationId}}/{{$parameter.interactionToken}}/messages/{{$parameter.messageId}}',
-					},
-				},
-			},
-			{
+				method: 'GET',
+				url: '=/webhooks/{{$parameter.applicationId}}/{{$parameter.interactionToken}}/messages/{{$parameter.messageId}}',
+			}),
+			defineDiscordRestOperation({
 				name: 'Get Original Response',
 				value: 'getOriginalResponse',
 				action: 'Get original response',
-				routing: {
-					request: {
-						method: 'GET',
-						url: '=/webhooks/{{$parameter.applicationId}}/{{$parameter.interactionToken}}/messages/@original',
-					},
-				},
-			},
+				method: 'GET',
+				url: '=/webhooks/{{$parameter.applicationId}}/{{$parameter.interactionToken}}/messages/@original',
+			}),
 		],
-		default: 'createInitialCallback',
-	},
+		'createInitialCallback',
+	),
 ];
 
 export const interactionResponseFields: INodeProperties[] = [
