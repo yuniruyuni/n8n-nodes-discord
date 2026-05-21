@@ -20,6 +20,32 @@ import { registerGatewaySender, unregisterGatewaySender } from './gatewaySendBus
 // causing duplicate emits that accumulate per re-activation.
 const activeConnections = new Map<string, DiscordGatewayConnection>();
 
+async function closeStaleConnection(registryKey: string): Promise<void> {
+	const stale = activeConnections.get(registryKey);
+	if (!stale) {
+		return;
+	}
+
+	activeConnections.delete(registryKey);
+	await stale.close();
+}
+
+function registerActiveConnection(
+	registryKey: string,
+	connection: DiscordGatewayConnection,
+): void {
+	activeConnections.set(registryKey, connection);
+}
+
+function unregisterActiveConnection(
+	registryKey: string,
+	connection: DiscordGatewayConnection,
+): void {
+	if (activeConnections.get(registryKey) === connection) {
+		activeConnections.delete(registryKey);
+	}
+}
+
 export class DiscordTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Discord Trigger',
@@ -75,11 +101,7 @@ export class DiscordTrigger implements INodeType {
 		// reload during dev, etc.).
 		// We include workflow ID for process-wide uniqueness, and node ID because
 		// it is persistent across renames.
-		const stale = activeConnections.get(registryKey);
-		if (stale) {
-			activeConnections.delete(registryKey);
-			await stale.close();
-		}
+		await closeStaleConnection(registryKey);
 
 		const onEvent = (eventData: IDataObject) => {
 			this.emit([this.helpers.returnJsonArray([eventData])]);
@@ -90,7 +112,7 @@ export class DiscordTrigger implements INodeType {
 		// Register the connection BEFORE connecting to ensure that if trigger()
 		// is called again while connect() is in progress, the next call can
 		// find and close this connection.
-		activeConnections.set(registryKey, connection);
+		registerActiveConnection(registryKey, connection);
 
 		const sender = (payload: { op: number; d: unknown }) => connection.sendCommand(payload);
 		registerGatewaySender(connectionName, sender);
@@ -99,9 +121,7 @@ export class DiscordTrigger implements INodeType {
 			await connection.connect();
 		} catch (error) {
 			// If connection fails, make sure we don't leave a dead reference in the map
-			if (activeConnections.get(registryKey) === connection) {
-				activeConnections.delete(registryKey);
-			}
+			unregisterActiveConnection(registryKey, connection);
 			unregisterGatewaySender(connectionName, sender);
 			throw new NodeOperationError(this.getNode(), error as Error);
 		}
@@ -109,9 +129,7 @@ export class DiscordTrigger implements INodeType {
 		return {
 			closeFunction: async () => {
 				unregisterGatewaySender(connectionName, sender);
-				if (activeConnections.get(registryKey) === connection) {
-					activeConnections.delete(registryKey);
-				}
+				unregisterActiveConnection(registryKey, connection);
 				await connection.close();
 			},
 		};
