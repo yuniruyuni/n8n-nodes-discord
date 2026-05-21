@@ -19,6 +19,8 @@ export class DiscordGatewayConnection {
 	) {}
 
 	async connect(): Promise<void> {
+		if (this.closing) return;
+
 		const credentials = await this.trigger.getCredentials('discordBotApi');
 		const token = credentials.botToken as string;
 		const autoCalculateIntents = this.trigger.getNodeParameter('autoCalculateIntents') as boolean;
@@ -26,8 +28,11 @@ export class DiscordGatewayConnection {
 			? []
 			: (this.trigger.getNodeParameter('intents') as string[]);
 		const intents = calculateIntents(this.event, selectedIntents);
+
+		if (this.closing) return;
 		const gatewayUrl = await this.getGatewayUrl();
 
+		if (this.closing) return;
 		this.ws = this.createWebSocket(gatewayUrl);
 		await this.ws.connect({
 			token,
@@ -37,6 +42,12 @@ export class DiscordGatewayConnection {
 				sequence?: number;
 			},
 		});
+
+		if (this.closing) {
+			await this.ws.close();
+			return;
+		}
+
 		this.reconnectAttempts = 0;
 		this.persistSessionState();
 	}

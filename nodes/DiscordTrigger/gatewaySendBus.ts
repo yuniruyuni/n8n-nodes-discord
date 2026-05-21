@@ -15,8 +15,10 @@ export function registerGatewaySender(name: string, send: GatewaySender): void {
 	registry.set(name, send);
 }
 
-export function unregisterGatewaySender(name: string): void {
-	registry.delete(name);
+export function unregisterGatewaySender(name: string, sender: GatewaySender): void {
+	if (registry.get(name) === sender) {
+		registry.delete(name);
+	}
 }
 
 export function getGatewaySender(name: string): GatewaySender | undefined {
