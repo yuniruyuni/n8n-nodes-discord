@@ -220,14 +220,12 @@ export class GatewayWebSocket {
 		}
 
 		if (op === OPCODE_RECONNECT) {
-			void this.close();
-			this.onDisconnect(this.sessionId !== null);
+			this.requestReconnect(this.sessionId !== null);
 			return;
 		}
 
 		if (op === OPCODE_INVALID_SESSION) {
-			const canResume = payload.d === true;
-			this.onDisconnect(canResume);
+			this.requestReconnect(payload.d === true);
 			return;
 		}
 
@@ -288,8 +286,7 @@ export class GatewayWebSocket {
 					workflowId: this.workflowId,
 					nodeType: 'n8n-nodes-discord.discordTrigger',
 				});
-				void this.close();
-				this.onDisconnect(this.sessionId !== null);
+				this.requestReconnect(this.sessionId !== null);
 				return;
 			}
 			this.sendHeartbeat();
@@ -301,6 +298,11 @@ export class GatewayWebSocket {
 
 	private stopHeartbeat(): void {
 		this.heartbeatEpoch++;
+	}
+
+	private requestReconnect(canResume: boolean): void {
+		void this.close();
+		this.onDisconnect(canResume);
 	}
 
 	private sendHeartbeat(): void {
