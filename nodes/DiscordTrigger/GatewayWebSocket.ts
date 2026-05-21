@@ -31,6 +31,7 @@ export class GatewayWebSocket {
 	private sessionId: string | null = null;
 	private resumeGatewayUrl: string | null = null;
 	private closing = false;
+	private pendingConnectReject: ((error: Error) => void) | null = null;
 
 	constructor(
 		private readonly gatewayUrl: string,
@@ -44,14 +45,23 @@ export class GatewayWebSocket {
 
 		return new Promise((resolve, reject) => {
 			let settled = false;
+			this.pendingConnectReject = (error: Error) => {
+				if (settled) return;
+				settled = true;
+				this.pendingConnectReject = null;
+				reject(error);
+			};
+
 			const settleResolve = (): void => {
 				if (settled) return;
 				settled = true;
+				this.pendingConnectReject = null;
 				resolve();
 			};
 			const settleReject = (error: Error): void => {
 				if (settled) return;
 				settled = true;
+				this.pendingConnectReject = null;
 				reject(error);
 			};
 
@@ -112,6 +122,11 @@ export class GatewayWebSocket {
 	async close(): Promise<void> {
 		this.closing = true;
 		this.stopHeartbeat();
+
+		if (this.pendingConnectReject) {
+			this.pendingConnectReject(new ApplicationError('Discord Gateway connection aborted by close request'));
+		}
+
 		const ws = this.ws;
 		this.ws = null;
 		if (!ws) {
