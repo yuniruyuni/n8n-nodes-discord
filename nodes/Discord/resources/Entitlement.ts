@@ -1,15 +1,6 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-const successResponse = {
-	postReceive: [
-		{
-			type: 'set' as const,
-			properties: {
-				value: '={{ { "success": true } }}',
-			},
-		},
-	],
-};
+import { successOutput } from '../shared/routing';
 
 const createTestBody =
 	'={{ { sku_id: $parameter.skuId, owner_id: $parameter.ownerId, owner_type: Number($parameter.ownerType) } }}';
@@ -57,7 +48,7 @@ export const entitlementOperations: INodeProperties[] = [
 						method: 'POST',
 						url: '=/applications/{{$parameter.applicationId}}/entitlements/{{$parameter.entitlementId}}/consume',
 					},
-					output: successResponse,
+					output: successOutput,
 				},
 			},
 			{
@@ -81,7 +72,7 @@ export const entitlementOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/applications/{{$parameter.applicationId}}/entitlements/{{$parameter.entitlementId}}',
 					},
-					output: successResponse,
+					output: successOutput,
 				},
 			},
 		],

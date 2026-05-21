@@ -1,31 +1,13 @@
 import type {
-	IDataObject,
 	IExecuteSingleFunctions,
 	IHttpRequestOptions,
 	INodeProperties,
 } from 'n8n-workflow';
 
-import {
-	buildAllowedMentionsFromCollection,
-	createAllowedMentionsCollectionField,
-} from '../shared/allowedMentions';
-import {
-	buildAttachmentMetadata,
-	buildDiscordMultipartBody,
-	createAttachmentsCollectionField,
-	type DiscordAttachmentInput,
-	type DiscordMultipartFile,
-} from '../shared/attachments';
+import { createAllowedMentionsCollectionField } from '../shared/allowedMentions';
+import { createAttachmentsCollectionField } from '../shared/attachments';
 import { createAuditLogReasonField } from '../shared/auditLog';
 import {
-	DISCORD_MESSAGE_FLAG_IS_COMPONENTS_V2,
-	buildButtonsActionRow,
-	buildMediaGalleryComponent,
-	buildMentionableSelectActionRow,
-	buildSeparatorComponents,
-	buildStringSelectActionRow,
-	buildTextDisplayComponents,
-	buildV2FileComponents,
 	createButtonComponentsField,
 	createComponentsJsonField,
 	createMediaGalleryField,
@@ -34,313 +16,31 @@ import {
 	createStringSelectComponentField,
 	createTextDisplayField,
 	createV2FileComponentField,
-	hasV2LayoutComponents,
-	validateComponents,
-	validateV2Components,
-	type DiscordComponent,
 } from '../shared/components';
-import { buildEmbedsFromCollection, createEmbedsCollectionField } from '../shared/embeds';
-import { parseOptionalJsonField } from '../shared/messagePayload';
-import { parseCommaSeparated } from '../shared/validators';
-
-// Read an attachments collection parameter into the normalized DiscordAttachmentInput list.
-function readAttachmentInputs(this: IExecuteSingleFunctions): DiscordAttachmentInput[] {
-	const raw = this.getNodeParameter('attachments', {}) as IDataObject;
-	const collection = raw?.attachment;
-	if (!Array.isArray(collection)) {
-		return [];
-	}
-
-	return collection
-		.map((entry) => {
-			if (!entry || typeof entry !== 'object') {
-				return undefined;
-			}
-			const record = entry as IDataObject;
-			const binaryPropertyName =
-				typeof record.binaryPropertyName === 'string' ? record.binaryPropertyName : '';
-			if (binaryPropertyName === '') {
-				return undefined;
-			}
-			const input: DiscordAttachmentInput = { binaryPropertyName };
-			if (typeof record.filename === 'string' && record.filename !== '') {
-				input.filename = record.filename;
-			}
-			if (typeof record.description === 'string' && record.description !== '') {
-				input.description = record.description;
-			}
-			if (typeof record.contentType === 'string' && record.contentType !== '') {
-				input.contentType = record.contentType;
-			}
-			return input;
-		})
-		.filter((entry): entry is DiscordAttachmentInput => entry !== undefined);
-}
-
-async function loadAttachmentFiles(
-	context: IExecuteSingleFunctions,
-	inputs: DiscordAttachmentInput[],
-): Promise<DiscordMultipartFile[]> {
-	const files: DiscordMultipartFile[] = [];
-	for (const input of inputs) {
-		const binaryData = context.helpers.assertBinaryData(input.binaryPropertyName);
-		const buffer = await context.helpers.getBinaryDataBuffer(input.binaryPropertyName);
-		files.push({
-			name: input.filename ?? binaryData.fileName ?? input.binaryPropertyName,
-			data: buffer,
-			contentType: input.contentType ?? binaryData.mimeType,
-		});
-	}
-	return files;
-}
-
-function readOptionalString(context: IExecuteSingleFunctions, name: string): string | undefined {
-	const value = context.getNodeParameter(name, '') as unknown;
-	if (typeof value !== 'string') {
-		return undefined;
-	}
-	const trimmed = value.trim();
-	return trimmed === '' ? undefined : trimmed;
-}
-
-function readOptionalNumber(context: IExecuteSingleFunctions, name: string): number | undefined {
-	const value = context.getNodeParameter(name, '') as unknown;
-	if (value === '' || value === undefined || value === null) {
-		return undefined;
-	}
-	const numeric = typeof value === 'number' ? value : Number(value);
-	return Number.isFinite(numeric) ? numeric : undefined;
-}
-
-function readOptionalBoolean(context: IExecuteSingleFunctions, name: string): boolean | undefined {
-	const value = context.getNodeParameter(name, false) as unknown;
-	return typeof value === 'boolean' ? value : undefined;
-}
-
-function readSnowflakeArray(context: IExecuteSingleFunctions, name: string): string[] | undefined {
-	const value = context.getNodeParameter(name, '') as unknown;
-	if (typeof value !== 'string' || value.trim() === '') {
-		return undefined;
-	}
-	const entries = parseCommaSeparated(value);
-	return entries.length > 0 ? entries : undefined;
-}
-
-function buildExecutePayload(context: IExecuteSingleFunctions): {
-	payload: IDataObject;
-	attachments: DiscordAttachmentInput[];
-} {
-	const payload: IDataObject = {};
-
-	const content = readOptionalString(context, 'content');
-	if (content !== undefined) {
-		payload.content = content;
-	}
-
-	const username = readOptionalString(context, 'username');
-	if (username !== undefined) {
-		payload.username = username;
-	}
-
-	const avatarUrl = readOptionalString(context, 'avatarUrl');
-	if (avatarUrl !== undefined) {
-		payload.avatar_url = avatarUrl;
-	}
-
-	const tts = readOptionalBoolean(context, 'tts');
-	if (tts) {
-		payload.tts = true;
-	}
-
-	const userFlags = readOptionalNumber(context, 'flags');
-
-	const threadName = readOptionalString(context, 'threadName');
-	if (threadName !== undefined) {
-		payload.thread_name = threadName;
-	}
-
-	const appliedTags = readSnowflakeArray(context, 'appliedTags');
-	if (appliedTags !== undefined) {
-		payload.applied_tags = appliedTags;
-	}
-
-	const embedsValue = context.getNodeParameter('embeds', {}) as unknown;
-	const embeds = buildEmbedsFromCollection(embedsValue);
-	if (embeds.length > 0) {
-		payload.embeds = embeds;
-	}
-
-	// Guided builders compose action rows first; raw JSON `components` is then
-	// appended as an escape hatch (e.g. v2 layout) rather than overriding them.
-	const rows: DiscordComponent[] = [];
-
-	const buttonRowRaw = context.getNodeParameter('buttonRow', {}) as unknown;
-	rows.push(...buildButtonsActionRow(buttonRowRaw));
-
-	const stringSelectRaw = context.getNodeParameter('stringSelect', {}) as unknown;
-	rows.push(...buildStringSelectActionRow(stringSelectRaw));
-
-	const mentionableSelectRaw = context.getNodeParameter('mentionableSelect', {}) as unknown;
-	rows.push(...buildMentionableSelectActionRow(mentionableSelectRaw));
-
-	const componentsRaw = context.getNodeParameter('components', '') as unknown;
-	const components = parseOptionalJsonField<unknown>(componentsRaw, 'Components');
-	if (Array.isArray(components) && components.length > 0) {
-		rows.push(...(components as DiscordComponent[]));
-	}
-
-	const textDisplaysRaw = context.getNodeParameter('textDisplays', {}) as unknown;
-	rows.push(...buildTextDisplayComponents(textDisplaysRaw));
-
-	const separatorsRaw = context.getNodeParameter('separators', {}) as unknown;
-	rows.push(...buildSeparatorComponents(separatorsRaw));
-
-	const mediaGalleryRaw = context.getNodeParameter('mediaGallery', {}) as unknown;
-	const mediaGallery = buildMediaGalleryComponent(mediaGalleryRaw);
-	if (mediaGallery !== undefined) {
-		rows.push(mediaGallery);
-	}
-
-	const v2FilesRaw = context.getNodeParameter('v2Files', {}) as unknown;
-	rows.push(...buildV2FileComponents(v2FilesRaw));
-
-	if (rows.length > 0) {
-		validateComponents(rows);
-		validateV2Components(rows);
-		payload.components = rows as unknown as IDataObject[];
-	}
-
-	// Auto-OR the IS_COMPONENTS_V2 flag when any v2 layout component is present;
-	// preserves any flag the user explicitly set in the Flags field.
-	let resolvedFlags = userFlags;
-	if (rows.length > 0 && hasV2LayoutComponents(rows)) {
-		resolvedFlags = (resolvedFlags ?? 0) | DISCORD_MESSAGE_FLAG_IS_COMPONENTS_V2;
-	}
-	if (resolvedFlags !== undefined) {
-		payload.flags = resolvedFlags;
-	}
-
-	const allowedMentionsValue = context.getNodeParameter('allowedMentions', {}) as unknown;
-	const allowedMentions = buildAllowedMentionsFromCollection(allowedMentionsValue);
-	if (allowedMentions !== undefined) {
-		payload.allowed_mentions = allowedMentions;
-	}
-
-	const pollRaw = context.getNodeParameter('poll', '') as unknown;
-	const poll = parseOptionalJsonField<IDataObject>(pollRaw, 'Poll');
-	if (poll !== undefined) {
-		payload.poll = poll;
-	}
-
-	const attachments = readAttachmentInputs.call(context);
-	if (attachments.length > 0) {
-		payload.attachments = buildAttachmentMetadata(attachments);
-	}
-
-	return { payload, attachments };
-}
-
-function buildEditMessagePayload(context: IExecuteSingleFunctions): {
-	payload: IDataObject;
-	attachments: DiscordAttachmentInput[];
-} {
-	const payload: IDataObject = {};
-
-	const content = readOptionalString(context, 'content');
-	if (content !== undefined) {
-		payload.content = content;
-	}
-
-	const embedsValue = context.getNodeParameter('embeds', {}) as unknown;
-	const embeds = buildEmbedsFromCollection(embedsValue);
-	if (embeds.length > 0) {
-		payload.embeds = embeds;
-	}
-
-	// Guided builders compose action rows first; raw JSON `components` is then
-	// appended as an escape hatch (e.g. v2 layout) rather than overriding them.
-	const rows: DiscordComponent[] = [];
-
-	const buttonRowRaw = context.getNodeParameter('buttonRow', {}) as unknown;
-	rows.push(...buildButtonsActionRow(buttonRowRaw));
-
-	const stringSelectRaw = context.getNodeParameter('stringSelect', {}) as unknown;
-	rows.push(...buildStringSelectActionRow(stringSelectRaw));
-
-	const mentionableSelectRaw = context.getNodeParameter('mentionableSelect', {}) as unknown;
-	rows.push(...buildMentionableSelectActionRow(mentionableSelectRaw));
-
-	const componentsRaw = context.getNodeParameter('components', '') as unknown;
-	const components = parseOptionalJsonField<unknown>(componentsRaw, 'Components');
-	if (Array.isArray(components) && components.length > 0) {
-		rows.push(...(components as DiscordComponent[]));
-	}
-
-	const textDisplaysRaw = context.getNodeParameter('textDisplays', {}) as unknown;
-	rows.push(...buildTextDisplayComponents(textDisplaysRaw));
-
-	const separatorsRaw = context.getNodeParameter('separators', {}) as unknown;
-	rows.push(...buildSeparatorComponents(separatorsRaw));
-
-	const mediaGalleryRaw = context.getNodeParameter('mediaGallery', {}) as unknown;
-	const mediaGallery = buildMediaGalleryComponent(mediaGalleryRaw);
-	if (mediaGallery !== undefined) {
-		rows.push(mediaGallery);
-	}
-
-	const v2FilesRaw = context.getNodeParameter('v2Files', {}) as unknown;
-	rows.push(...buildV2FileComponents(v2FilesRaw));
-
-	if (rows.length > 0) {
-		validateComponents(rows);
-		validateV2Components(rows);
-		payload.components = rows as unknown as IDataObject[];
-	}
-
-	// Auto-OR the IS_COMPONENTS_V2 flag when v2 layout components are present.
-	if (rows.length > 0 && hasV2LayoutComponents(rows)) {
-		const existing = typeof payload.flags === 'number' ? payload.flags : 0;
-		payload.flags = existing | DISCORD_MESSAGE_FLAG_IS_COMPONENTS_V2;
-	}
-
-	const allowedMentionsValue = context.getNodeParameter('allowedMentions', {}) as unknown;
-	const allowedMentions = buildAllowedMentionsFromCollection(allowedMentionsValue);
-	if (allowedMentions !== undefined) {
-		payload.allowed_mentions = allowedMentions;
-	}
-
-	const attachments = readAttachmentInputs.call(context);
-	if (attachments.length > 0) {
-		payload.attachments = buildAttachmentMetadata(attachments);
-	}
-
-	return { payload, attachments };
-}
+import { createEmbedsCollectionField } from '../shared/embeds';
+import { applyMessageLikeBody, buildMessageLikePayload } from '../shared/messageLikePayload';
+import { successOutput } from '../shared/routing';
 
 // preSend for execute: assembles the full webhook payload and switches to multipart when files are attached.
 export async function presendWebhookExecute(
 	this: IExecuteSingleFunctions,
 	requestOptions: IHttpRequestOptions,
 ): Promise<IHttpRequestOptions> {
-	const { payload, attachments } = buildExecutePayload(this);
-
-	if (attachments.length > 0) {
-		const files = await loadAttachmentFiles(this, attachments);
-		const multipart = buildDiscordMultipartBody({ payloadJson: payload, files });
-		return {
-			...requestOptions,
-			body: multipart.body,
-			headers: {
-				...(requestOptions.headers ?? {}),
-				...multipart.headers,
+	return applyMessageLikeBody(
+		this,
+		requestOptions,
+		buildMessageLikePayload(this, {
+			flags: 'number',
+			include: {
+				appliedTags: true,
+				avatarUrl: true,
+				poll: true,
+				threadName: true,
+				tts: true,
+				username: true,
 			},
-		};
-	}
-
-	return {
-		...requestOptions,
-		body: payload,
-	};
+		}),
+	);
 }
 
 // preSend for editMessage: same multipart switch logic but uses the edit payload shape.
@@ -348,37 +48,16 @@ export async function presendWebhookEditMessage(
 	this: IExecuteSingleFunctions,
 	requestOptions: IHttpRequestOptions,
 ): Promise<IHttpRequestOptions> {
-	const { payload, attachments } = buildEditMessagePayload(this);
-
-	if (attachments.length > 0) {
-		const files = await loadAttachmentFiles(this, attachments);
-		const multipart = buildDiscordMultipartBody({ payloadJson: payload, files });
-		return {
-			...requestOptions,
-			body: multipart.body,
-			headers: {
-				...(requestOptions.headers ?? {}),
-				...multipart.headers,
+	return applyMessageLikeBody(
+		this,
+		requestOptions,
+		buildMessageLikePayload(this, {
+			include: {
+				flags: false,
 			},
-		};
-	}
-
-	return {
-		...requestOptions,
-		body: payload,
-	};
+		}),
+	);
 }
-
-const successResponse = {
-	postReceive: [
-		{
-			type: 'set' as const,
-			properties: {
-				value: '={{ { "success": true } }}',
-			},
-		},
-	],
-};
 
 const createBody =
 	'={{ { name: $parameter.name, ...($parameter.avatar !== "" ? { avatar: $parameter.avatar } : {}) } }}';
@@ -424,7 +103,7 @@ export const webhookOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/webhooks/{{$parameter.webhookId}}',
 					},
-					output: successResponse,
+					output: successOutput,
 				},
 			},
 			{
@@ -439,7 +118,7 @@ export const webhookOperations: INodeProperties[] = [
 							thread_id: '={{$parameter.threadId || undefined}}',
 						},
 					},
-					output: successResponse,
+					output: successOutput,
 				},
 			},
 			{
@@ -451,7 +130,7 @@ export const webhookOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/webhooks/{{$parameter.webhookId}}/{{$parameter.webhookToken}}',
 					},
-					output: successResponse,
+					output: successOutput,
 				},
 			},
 			{

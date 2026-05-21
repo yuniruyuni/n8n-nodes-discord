@@ -11,17 +11,7 @@ import {
 	discordPermissionOptions,
 	type DiscordPermissionName,
 } from '../shared/permissions';
-
-const successResponse = {
-	postReceive: [
-		{
-			type: 'set' as const,
-			properties: {
-				value: '={{ { "success": true } }}',
-			},
-		},
-	],
-};
+import { successOutput } from '../shared/routing';
 
 // Approach: create/edit operations use a preSend hook to assemble the body so we
 // can compose the guided `commandOptions` builder, the guided localization
@@ -408,7 +398,7 @@ export const applicationCommandOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/applications/{{$parameter.applicationId}}/commands/{{$parameter.commandId}}',
 					},
-					output: successResponse,
+					output: successOutput,
 				},
 			},
 			{
@@ -420,7 +410,7 @@ export const applicationCommandOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/applications/{{$parameter.applicationId}}/guilds/{{$parameter.guildId}}/commands/{{$parameter.commandId}}',
 					},
-					output: successResponse,
+					output: successOutput,
 				},
 			},
 			{

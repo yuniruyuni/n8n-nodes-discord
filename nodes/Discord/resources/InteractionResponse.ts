@@ -46,17 +46,7 @@ import {
 	type DiscordComponent,
 } from '../shared/components';
 import { parseOptionalJsonField, createRawJsonField } from '../shared/messagePayload';
-
-const successResponse = {
-	postReceive: [
-		{
-			type: 'set' as const,
-			properties: {
-				value: '={{ { "success": true } }}',
-			},
-		},
-	],
-};
+import { successOutput } from '../shared/routing';
 
 const INTERACTION_CALLBACK_TYPE = {
 	CHANNEL_MESSAGE_WITH_SOURCE: 4,
@@ -476,7 +466,7 @@ export const interactionResponseOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/webhooks/{{$parameter.applicationId}}/{{$parameter.interactionToken}}/messages/{{$parameter.messageId}}',
 					},
-					output: successResponse,
+					output: successOutput,
 				},
 			},
 			{
@@ -488,7 +478,7 @@ export const interactionResponseOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/webhooks/{{$parameter.applicationId}}/{{$parameter.interactionToken}}/messages/@original',
 					},
-					output: successResponse,
+					output: successOutput,
 				},
 			},
 			{

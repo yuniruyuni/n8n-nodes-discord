@@ -9,18 +9,7 @@ import {
 } from 'n8n-workflow';
 
 import { getGatewaySender, listGatewaySenders } from '../DiscordTrigger/gatewaySendBus';
-
-const OPCODE_UPDATE_PRESENCE = 3;
-const OPCODE_UPDATE_VOICE_STATE = 4;
-const OPCODE_REQUEST_GUILD_MEMBERS = 8;
-const OPCODE_REQUEST_SOUNDBOARD_SOUNDS = 31;
-
-function splitSnowflakes(value: string): string[] {
-	return value
-		.split(',')
-		.map((s) => s.trim())
-		.filter((s) => s.length > 0);
-}
+import { buildGatewayCommandPayload } from './payloads';
 
 export class DiscordGatewayCommand implements INodeType {
 	description: INodeTypeDescription = {
@@ -339,162 +328,41 @@ export class DiscordGatewayCommand implements INodeType {
 
 		for (let i = 0; i < items.length; i++) {
 			try {
-			const connectionName = (this.getNodeParameter('connectionName', i, 'default') as string) || 'default';
-			const operation = this.getNodeParameter('operation', i) as string;
+				const connectionName =
+					(this.getNodeParameter('connectionName', i, 'default') as string) || 'default';
 
-			const sender = getGatewaySender(connectionName);
-			if (!sender) {
-				const known = listGatewaySenders();
-				const hint = known.length > 0 ? ` Known connections: ${known.join(', ')}.` : '';
-				throw new NodeOperationError(
-					this.getNode(),
-					`No active Discord Gateway connection named '${connectionName}'. Make sure a Discord Trigger with this Connection Name is running.${hint}`,
-					{ itemIndex: i },
-				);
-			}
-
-			let op: number;
-			let d: IDataObject;
-
-			if (operation === 'updatePresence') {
-				const status = this.getNodeParameter('status', i, 'online') as string;
-				const afk = this.getNodeParameter('afk', i, false) as boolean;
-				const since = this.getNodeParameter('since', i, 0) as number;
-				const activityType = this.getNodeParameter('activityType', i, -1) as number;
-
-				const activities: IDataObject[] = [];
-				if (activityType >= 0) {
-					const activityName = (this.getNodeParameter('activityName', i, '') as string).trim();
-					if (activityName === '') {
-						throw new NodeOperationError(
-							this.getNode(),
-							'Activity Name is required when Activity Type is set',
-							{ itemIndex: i },
-						);
-					}
-					const activity: IDataObject = {
-						type: activityType,
-						name: activityName,
-					};
-					if (activityType === 1) {
-						const activityUrl = (this.getNodeParameter('activityUrl', i, '') as string).trim();
-						if (activityUrl !== '') {
-							activity.url = activityUrl;
-						}
-					}
-					const activityState = (this.getNodeParameter('activityState', i, '') as string).trim();
-					if (activityState !== '') {
-						activity.state = activityState;
-					}
-					activities.push(activity);
-				}
-
-				op = OPCODE_UPDATE_PRESENCE;
-				d = {
-					since: since > 0 ? since : null,
-					activities,
-					status,
-					afk,
-				};
-			} else if (operation === 'updateVoiceState') {
-				const guildId = (this.getNodeParameter('guildId', i, '') as string).trim();
-				const channelId = (this.getNodeParameter('channelId', i, '') as string).trim();
-				const selfMute = this.getNodeParameter('selfMute', i, false) as boolean;
-				const selfDeaf = this.getNodeParameter('selfDeaf', i, false) as boolean;
-
-				if (guildId === '') {
-					throw new NodeOperationError(this.getNode(), 'Guild ID is required', {
-						itemIndex: i,
-					});
-				}
-
-				op = OPCODE_UPDATE_VOICE_STATE;
-				d = {
-					guild_id: guildId,
-					channel_id: channelId === '' ? null : channelId,
-					self_mute: selfMute,
-					self_deaf: selfDeaf,
-				};
-			} else if (operation === 'requestGuildMembers') {
-				const guildId = (this.getNodeParameter('guildId', i, '') as string).trim();
-				const query = this.getNodeParameter('query', i, '') as string;
-				const maxMembers = this.getNodeParameter('maxMembers', i, 0) as number;
-				const presences = this.getNodeParameter('presences', i, false) as boolean;
-				const userIdsRaw = (this.getNodeParameter('userIds', i, '') as string).trim();
-				const nonce = (this.getNodeParameter('nonce', i, '') as string).trim();
-
-				if (guildId === '') {
-					throw new NodeOperationError(this.getNode(), 'Guild ID is required', {
-						itemIndex: i,
-					});
-				}
-
-				const userIds = userIdsRaw === '' ? [] : splitSnowflakes(userIdsRaw);
-
-				if (query !== '' && userIds.length > 0) {
+				const sender = getGatewaySender(connectionName);
+				if (!sender) {
+					const known = listGatewaySenders();
+					const hint = known.length > 0 ? ` Known connections: ${known.join(', ')}.` : '';
 					throw new NodeOperationError(
 						this.getNode(),
-						'Query and User IDs are mutually exclusive; provide only one',
+						`No active Discord Gateway connection named '${connectionName}'. Make sure a Discord Trigger with this Connection Name is running.${hint}`,
 						{ itemIndex: i },
 					);
 				}
 
-				const payload: IDataObject = {
-					guild_id: guildId,
-					limit: maxMembers,
-					presences,
-				};
-				if (userIds.length > 0) {
-					payload.user_ids = userIds;
-				} else {
-					payload.query = query;
-				}
-				if (nonce !== '') {
-					payload.nonce = nonce;
-				}
-
-				op = OPCODE_REQUEST_GUILD_MEMBERS;
-				d = payload;
-			} else if (operation === 'requestSoundboardSounds') {
-				const guildIdsRaw = (this.getNodeParameter('guildIds', i, '') as string).trim();
-				const guildIds = splitSnowflakes(guildIdsRaw);
-				if (guildIds.length === 0) {
+				const { operation, sentPayload } = buildGatewayCommandPayload(this, i);
+				try {
+					sender(sentPayload);
+				} catch (error) {
+					const message = error instanceof Error ? error.message : String(error);
 					throw new NodeOperationError(
 						this.getNode(),
-						'At least one Guild ID is required',
+						`Failed to send Discord Gateway command: ${message}`,
 						{ itemIndex: i },
 					);
 				}
 
-				op = OPCODE_REQUEST_SOUNDBOARD_SOUNDS;
-				d = { guild_ids: guildIds };
-			} else {
-				throw new NodeOperationError(this.getNode(), `Unsupported operation: ${operation}`, {
-					itemIndex: i,
+				returnData.push({
+					json: {
+						success: true,
+						operation,
+						connectionName,
+						sentPayload: sentPayload as unknown as IDataObject,
+					},
+					pairedItem: { item: i },
 				});
-			}
-
-			const sentPayload = { op, d };
-			try {
-				sender(sentPayload);
-			} catch (error) {
-				const message = error instanceof Error ? error.message : String(error);
-				throw new NodeOperationError(
-					this.getNode(),
-					`Failed to send Discord Gateway command: ${message}`,
-					{ itemIndex: i },
-				);
-			}
-
-			returnData.push({
-				json: {
-					success: true,
-					operation,
-					connectionName,
-					sentPayload: sentPayload as unknown as IDataObject,
-				},
-				pairedItem: { item: i },
-			});
 			} catch (error) {
 				if (this.continueOnFail()) {
 					const message = error instanceof Error ? error.message : String(error);
