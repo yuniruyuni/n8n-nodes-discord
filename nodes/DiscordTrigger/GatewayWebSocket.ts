@@ -227,6 +227,7 @@ export class GatewayWebSocket {
 
 		if (op === OPCODE_INVALID_SESSION) {
 			const canResume = payload.d === true;
+			void this.close();
 			this.onDisconnect(canResume);
 			return;
 		}

@@ -66,15 +66,18 @@ export class DiscordTrigger implements INodeType {
 		const event = this.getNodeParameter('event') as string;
 		const connectionName = (this.getNodeParameter('connectionName', 'default') as string) || 'default';
 
+		const workflowId = this.getWorkflow().id ?? '';
 		const nodeId = this.getNode().id;
+		const registryKey = `${workflowId}:${nodeId}`;
 
 		// Defensive cleanup for cases where n8n's lifecycle does not invoke
 		// closeFunction before re-running trigger() (workflow re-activation, hot
 		// reload during dev, etc.).
-		// We use node ID as the key because it is persistent across renames.
-		const stale = activeConnections.get(nodeId);
+		// We include workflow ID for process-wide uniqueness, and node ID because
+		// it is persistent across renames.
+		const stale = activeConnections.get(registryKey);
 		if (stale) {
-			activeConnections.delete(nodeId);
+			activeConnections.delete(registryKey);
 			await stale.close();
 		}
 
@@ -87,7 +90,7 @@ export class DiscordTrigger implements INodeType {
 		// Register the connection BEFORE connecting to ensure that if trigger()
 		// is called again while connect() is in progress, the next call can
 		// find and close this connection.
-		activeConnections.set(nodeId, connection);
+		activeConnections.set(registryKey, connection);
 
 		const sender = (payload: { op: number; d: unknown }) => connection.sendCommand(payload);
 		registerGatewaySender(connectionName, sender);
@@ -96,8 +99,8 @@ export class DiscordTrigger implements INodeType {
 			await connection.connect();
 		} catch (error) {
 			// If connection fails, make sure we don't leave a dead reference in the map
-			if (activeConnections.get(nodeId) === connection) {
-				activeConnections.delete(nodeId);
+			if (activeConnections.get(registryKey) === connection) {
+				activeConnections.delete(registryKey);
 			}
 			unregisterGatewaySender(connectionName, sender);
 			throw new NodeOperationError(this.getNode(), error as Error);
@@ -106,8 +109,8 @@ export class DiscordTrigger implements INodeType {
 		return {
 			closeFunction: async () => {
 				unregisterGatewaySender(connectionName, sender);
-				if (activeConnections.get(nodeId) === connection) {
-					activeConnections.delete(nodeId);
+				if (activeConnections.get(registryKey) === connection) {
+					activeConnections.delete(registryKey);
 				}
 				await connection.close();
 			},
