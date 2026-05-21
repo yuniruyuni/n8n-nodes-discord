@@ -2,6 +2,7 @@ import type { INodeProperties } from 'n8n-workflow';
 
 import { createAuditLogReasonField } from '../shared/auditLog';
 import { createRawJsonField } from '../shared/messagePayload';
+import { successOutput } from '../shared/routing';
 
 const guildBody =
 	'={{ { ...($parameter.name !== "" ? { name: $parameter.name } : {}), ...($parameter.description !== "" ? { description: $parameter.description } : {}), ...JSON.parse($parameter.rawJson || "{}") } }}';
@@ -110,16 +111,7 @@ export const guildOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/guilds/{{$parameter.guildId}}',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
@@ -188,16 +180,7 @@ export const guildOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/guilds/{{$parameter.guildId}}/bans/{{$parameter.userId}}',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
@@ -265,16 +248,7 @@ export const guildOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/guilds/{{$parameter.guildId}}/integrations/{{$parameter.integrationId}}',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{

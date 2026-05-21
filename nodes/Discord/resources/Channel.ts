@@ -11,6 +11,7 @@ import {
 	aggregateDiscordPermissions,
 	createPermissionMultiOptionsField,
 } from '../shared/permissions';
+import { successOutput } from '../shared/routing';
 import { DISCORD_SNOWFLAKE_PATTERN } from '../shared/snowflake';
 
 // preSend for editChannelPermissions: assembles the body from either the raw
@@ -132,16 +133,7 @@ export const channelOperations: INodeProperties[] = [
 						method: 'POST',
 						url: '=/channels/{{$parameter.channelId}}/typing',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
@@ -164,16 +156,7 @@ export const channelOperations: INodeProperties[] = [
 						method: 'PUT',
 						url: '=/channels/{{$parameter.channelId}}/messages/pins/{{$parameter.messageId}}',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
@@ -185,16 +168,7 @@ export const channelOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/channels/{{$parameter.channelId}}/messages/pins/{{$parameter.messageId}}',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
@@ -206,16 +180,7 @@ export const channelOperations: INodeProperties[] = [
 						method: 'PUT',
 						url: '=/channels/{{$parameter.channelId}}/messages/{{$parameter.messageId}}/reactions/{{encodeURIComponent($parameter.emoji)}}/@me',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
@@ -227,16 +192,7 @@ export const channelOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/channels/{{$parameter.channelId}}/messages/{{$parameter.messageId}}/reactions/{{encodeURIComponent($parameter.emoji)}}/@me',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
@@ -248,16 +204,7 @@ export const channelOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/channels/{{$parameter.channelId}}/messages/{{$parameter.messageId}}/reactions/{{encodeURIComponent($parameter.emoji)}}/{{$parameter.userId}}',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
@@ -280,16 +227,7 @@ export const channelOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/channels/{{$parameter.channelId}}/messages/{{$parameter.messageId}}/reactions',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
@@ -301,16 +239,7 @@ export const channelOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/channels/{{$parameter.channelId}}/messages/{{$parameter.messageId}}/reactions/{{encodeURIComponent($parameter.emoji)}}',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
@@ -323,16 +252,7 @@ export const channelOperations: INodeProperties[] = [
 						url: '=/channels/{{$parameter.channelId}}/messages/bulk-delete',
 						body: bulkDeleteBody,
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
@@ -358,16 +278,7 @@ export const channelOperations: INodeProperties[] = [
 						method: 'PUT',
 						url: '=/channels/{{$parameter.channelId}}/permissions/{{$parameter.overwriteId}}',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
@@ -379,16 +290,7 @@ export const channelOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/channels/{{$parameter.channelId}}/permissions/{{$parameter.overwriteId}}',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
@@ -447,16 +349,7 @@ export const channelOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/channels/{{$parameter.channelId}}/recipients/{{$parameter.userId}}',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
@@ -504,16 +397,7 @@ export const channelOperations: INodeProperties[] = [
 						method: 'PUT',
 						url: '=/channels/{{$parameter.channelId}}/thread-members/@me',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
@@ -525,16 +409,7 @@ export const channelOperations: INodeProperties[] = [
 						method: 'PUT',
 						url: '=/channels/{{$parameter.channelId}}/thread-members/{{$parameter.userId}}',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
@@ -546,16 +421,7 @@ export const channelOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/channels/{{$parameter.channelId}}/thread-members/@me',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
@@ -567,16 +433,7 @@ export const channelOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/channels/{{$parameter.channelId}}/thread-members/{{$parameter.userId}}',
 					},
-					output: {
-						postReceive: [
-							{
-								type: 'set',
-								properties: {
-									value: '={{ { "success": true } }}',
-								},
-							},
-						],
-					},
+					output: successOutput,
 				},
 			},
 			{
