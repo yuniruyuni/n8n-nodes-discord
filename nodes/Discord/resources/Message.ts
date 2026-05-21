@@ -16,6 +16,7 @@ import {
 	createTextDisplayField,
 	createV2FileComponentField,
 } from '../shared/components';
+import { showForOperation, showForResource } from '../shared/displayOptions';
 import { createEmbedsCollectionField } from '../shared/embeds';
 import { applyMessageLikeBody, buildMessageLikePayload } from '../shared/messageLikePayload';
 import { successOutput } from '../shared/routing';
@@ -120,7 +121,7 @@ export const messageOperations: INodeProperties[] = [
 						method: 'DELETE',
 						url: '=/channels/{{$parameter.channelId}}/messages/{{$parameter.messageId}}',
 					},
-						output: successOutput,
+					output: successOutput,
 				},
 			},
 			{
@@ -136,7 +137,7 @@ export const messageOperations: INodeProperties[] = [
 								'={{ ($parameter.messageIds || "").split(",").map(id => id.trim()).filter(id => id.length > 0) }}',
 						},
 					},
-						output: successOutput,
+					output: successOutput,
 				},
 			},
 			{
@@ -162,11 +163,6 @@ const channelField: INodeProperties = {
 	default: '',
 	required: true,
 	placeholder: 'e.g. 123456789012345678',
-	displayOptions: {
-		show: {
-			resource: ['message'],
-		},
-	},
 	description: 'Channel ID. Discord snowflake ID of the channel.',
 };
 
@@ -182,50 +178,40 @@ const flagOptions = [
 	{ name: 'Is Components V2', value: 1 << 15, description: 'Message uses the v2 components layout' },
 ];
 
-export const messageFields: INodeProperties[] = [
-	channelField,
-	{
-		displayName: 'Message',
-		name: 'messageId',
-		type: 'string',
-		default: '',
-		required: true,
-		placeholder: 'e.g. 123456789012345678',
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: ['get', 'delete', 'edit', 'crosspost'],
-			},
-		},
-		description: 'Message ID. Discord snowflake ID of the message.',
-	},
+const messageIdField: INodeProperties = {
+	displayName: 'Message',
+	name: 'messageId',
+	type: 'string',
+	default: '',
+	required: true,
+	placeholder: 'e.g. 123456789012345678',
+	description: 'Message ID. Discord snowflake ID of the message.',
+};
+
+const getMessageFields: INodeProperties[] = [messageIdField];
+const deleteMessageFields: INodeProperties[] = [messageIdField];
+const editMessageFields: INodeProperties[] = [messageIdField];
+const crosspostMessageFields: INodeProperties[] = [messageIdField];
+
+const bulkDeleteFields: INodeProperties[] = [
 	{
 		displayName: 'Message IDs',
 		name: 'messageIds',
 		type: 'string',
 		default: '',
 		required: true,
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: ['bulkDelete'],
-			},
-		},
 		placeholder: '123456789012345678, 234567890123456789',
 		description:
 			'Comma-separated Discord message snowflake IDs to delete. Discord requires between 2 and 100 IDs, no older than 14 days.',
 	},
+];
+
+const listMessageFields: INodeProperties[] = [
 	{
 		displayName: 'Around',
 		name: 'around',
 		type: 'string',
 		default: '',
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: ['list'],
-			},
-		},
 		description: 'Return messages around this snowflake ID',
 		routing: {
 			request: {
@@ -240,12 +226,6 @@ export const messageFields: INodeProperties[] = [
 		name: 'before',
 		type: 'string',
 		default: '',
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: ['list'],
-			},
-		},
 		description: 'Return messages before this snowflake ID',
 		routing: {
 			request: {
@@ -260,12 +240,6 @@ export const messageFields: INodeProperties[] = [
 		name: 'after',
 		type: 'string',
 		default: '',
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: ['list'],
-			},
-		},
 		description: 'Return messages after this snowflake ID',
 		routing: {
 			request: {
@@ -284,12 +258,6 @@ export const messageFields: INodeProperties[] = [
 			maxValue: 100,
 		},
 		default: 50,
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: ['list'],
-			},
-		},
 		description: 'Max number of results to return',
 		routing: {
 			request: {
@@ -299,6 +267,9 @@ export const messageFields: INodeProperties[] = [
 			},
 		},
 	},
+];
+
+const writeMessageFields: INodeProperties[] = [
 	{
 		displayName: 'Content',
 		name: 'content',
@@ -307,118 +278,32 @@ export const messageFields: INodeProperties[] = [
 			rows: 4,
 		},
 		default: '',
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: writeOperations,
-			},
-		},
 		description:
 			'Message content to send. Required unless embeds, components, or attachments are provided.',
 	},
-	createEmbedsCollectionField({
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: writeOperations,
-			},
-		},
-	}),
+	createEmbedsCollectionField(),
 	createButtonComponentsField({
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: writeOperations,
-			},
-		},
 		name: 'buttonRow',
 	}),
 	createStringSelectComponentField({
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: writeOperations,
-			},
-		},
 		name: 'stringSelect',
 	}),
 	createMentionableSelectComponentField({
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: writeOperations,
-			},
-		},
 		name: 'mentionableSelect',
 	}),
-	createComponentsJsonField({
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: writeOperations,
-			},
-		},
-	}),
-	createTextDisplayField({
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: writeOperations,
-			},
-		},
-	}),
-	createSeparatorComponentField({
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: writeOperations,
-			},
-		},
-	}),
-	createMediaGalleryField({
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: writeOperations,
-			},
-		},
-	}),
-	createV2FileComponentField({
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: writeOperations,
-			},
-		},
-	}),
-	createAttachmentsCollectionField({
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: writeOperations,
-			},
-		},
-	}),
-	createAllowedMentionsCollectionField({
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: writeOperations,
-			},
-		},
-	}),
+	createComponentsJsonField(),
+	createTextDisplayField(),
+	createSeparatorComponentField(),
+	createMediaGalleryField(),
+	createV2FileComponentField(),
+	createAttachmentsCollectionField(),
+	createAllowedMentionsCollectionField(),
 	{
 		displayName: 'Flags',
 		name: 'flags',
 		type: 'multiOptions',
 		default: [],
 		options: flagOptions,
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: writeOperations,
-			},
-		},
 		description:
 			'Bitwise message flags. Selected entries are OR-combined. Supports Suppress Embeds (1<<2), Suppress Notifications (1<<12), and Is Components V2 (1<<15).',
 	},
@@ -428,12 +313,6 @@ export const messageFields: INodeProperties[] = [
 		type: 'json',
 		default: '',
 		placeholder: '{"message_id":"...","channel_id":"...","type":0}',
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: writeOperations,
-			},
-		},
 		description:
 			'Raw Discord message_reference JSON object. Used for replies (type 0) and forwards (type 1).',
 	},
@@ -442,12 +321,6 @@ export const messageFields: INodeProperties[] = [
 		name: 'nonce',
 		type: 'string',
 		default: '',
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: writeOperations,
-			},
-		},
 		description: 'Optional nonce used by Discord to dedupe messages (max 25 characters)',
 	},
 	{
@@ -455,12 +328,17 @@ export const messageFields: INodeProperties[] = [
 		name: 'tts',
 		type: 'boolean',
 		default: false,
-		displayOptions: {
-			show: {
-				resource: ['message'],
-				operation: writeOperations,
-			},
-		},
 		description: 'Whether the message should be sent as a text-to-speech message',
 	},
+];
+
+export const messageFields: INodeProperties[] = [
+	...showForResource('message', [channelField]),
+	...showForOperation('message', ['get'], getMessageFields),
+	...showForOperation('message', ['delete'], deleteMessageFields),
+	...showForOperation('message', ['edit'], editMessageFields),
+	...showForOperation('message', ['crosspost'], crosspostMessageFields),
+	...showForOperation('message', ['bulkDelete'], bulkDeleteFields),
+	...showForOperation('message', ['list'], listMessageFields),
+	...showForOperation('message', writeOperations, writeMessageFields),
 ];

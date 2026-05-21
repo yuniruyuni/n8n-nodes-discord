@@ -24,6 +24,7 @@ import { userEvents } from './user';
 import { voiceEvents } from './voice';
 
 export type { DiscordEventMeta } from './types';
+export { shouldEmitGatewayEvent } from './policies';
 export { coreEvents } from './core';
 export { applicationCommandEvents } from './applicationCommand';
 export { autoModerationEvents } from './autoModeration';

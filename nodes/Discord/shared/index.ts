@@ -4,6 +4,7 @@ export * from './auditLog';
 export * from './components';
 export * from './constants';
 export * from './dataUri';
+export * from './displayOptions';
 export * from './embeds';
 export * from './intents';
 export * from './messagePayload';

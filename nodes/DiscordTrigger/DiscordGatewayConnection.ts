@@ -2,6 +2,7 @@ import { LoggerProxy, sleep, type IDataObject, type ITriggerFunctions } from 'n8
 
 import { DISCORD_API_BASE_URL } from '../Discord/shared/constants';
 import { calculateIntents } from '../Discord/shared/intents';
+import { shouldEmitGatewayEvent } from './events/policies';
 import { GatewayWebSocket } from './GatewayWebSocket';
 
 const MAX_RECONNECT_ATTEMPTS = 5;
@@ -98,17 +99,12 @@ export class DiscordGatewayConnection {
 			return;
 		}
 
-		if (eventName === 'MESSAGE_CREATE' || eventName === 'MESSAGE_UPDATE') {
-			const includeBotMessages = this.trigger.getNodeParameter(
-				'includeBotMessages',
-				false,
-			) as boolean;
-			if (!includeBotMessages) {
-				const author = data.author as IDataObject | undefined;
-				if (author?.bot === true || data.webhook_id || author?.system === true) {
-					return;
-				}
-			}
+		const includeBotMessages = this.trigger.getNodeParameter(
+			'includeBotMessages',
+			false,
+		) as boolean;
+		if (!shouldEmitGatewayEvent(eventName, data, { includeBotMessages })) {
+			return;
 		}
 
 		const emitRawPayload = this.trigger.getNodeParameter('emitRawPayload') as boolean;
