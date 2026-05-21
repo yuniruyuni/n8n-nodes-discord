@@ -9,6 +9,7 @@ export * from './embeds';
 export * from './intents';
 export * from './messagePayload';
 export * from './messageLikePayload';
+export * from './operation';
 export * from './pagination';
 export * from './permissions';
 export * from './rateLimits';

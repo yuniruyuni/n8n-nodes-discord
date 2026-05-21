@@ -1,83 +1,55 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-import { successOutput } from '../shared/routing';
+import { createOperationSelector, defineDiscordRestOperation } from '../shared/operation';
 
 const createTestBody =
 	'={{ { sku_id: $parameter.skuId, owner_id: $parameter.ownerId, owner_type: Number($parameter.ownerType) } }}';
 
 export const entitlementOperations: INodeProperties[] = [
-	{
-		displayName: 'Operation',
-		name: 'operation',
-		type: 'options',
-		noDataExpression: true,
-		displayOptions: {
-			show: {
-				resource: ['entitlement'],
-			},
-		},
-		options: [
-			{
+	createOperationSelector(
+		'entitlement',
+		[
+			defineDiscordRestOperation({
 				name: 'List',
 				value: 'list',
 				action: 'List',
-				routing: {
-					request: {
-						method: 'GET',
-						url: '=/applications/{{$parameter.applicationId}}/entitlements',
-					},
-				},
-			},
-			{
+				method: 'GET',
+				url: '=/applications/{{$parameter.applicationId}}/entitlements',
+			}),
+			defineDiscordRestOperation({
 				name: 'Get',
 				value: 'get',
 				action: 'Get',
-				routing: {
-					request: {
-						method: 'GET',
-						url: '=/applications/{{$parameter.applicationId}}/entitlements/{{$parameter.entitlementId}}',
-					},
-				},
-			},
-			{
+				method: 'GET',
+				url: '=/applications/{{$parameter.applicationId}}/entitlements/{{$parameter.entitlementId}}',
+			}),
+			defineDiscordRestOperation({
 				name: 'Consume',
 				value: 'consume',
 				action: 'Consume',
-				routing: {
-					request: {
-						method: 'POST',
-						url: '=/applications/{{$parameter.applicationId}}/entitlements/{{$parameter.entitlementId}}/consume',
-					},
-					output: successOutput,
-				},
-			},
-			{
+				method: 'POST',
+				url: '=/applications/{{$parameter.applicationId}}/entitlements/{{$parameter.entitlementId}}/consume',
+				successOutput: true,
+			}),
+			defineDiscordRestOperation({
 				name: 'Create Test',
 				value: 'createTest',
 				action: 'Create test',
-				routing: {
-					request: {
-						method: 'POST',
-						url: '=/applications/{{$parameter.applicationId}}/entitlements',
-						body: createTestBody,
-					},
-				},
-			},
-			{
+				method: 'POST',
+				url: '=/applications/{{$parameter.applicationId}}/entitlements',
+				body: createTestBody,
+			}),
+			defineDiscordRestOperation({
 				name: 'Delete Test',
 				value: 'deleteTest',
 				action: 'Delete test',
-				routing: {
-					request: {
-						method: 'DELETE',
-						url: '=/applications/{{$parameter.applicationId}}/entitlements/{{$parameter.entitlementId}}',
-					},
-					output: successOutput,
-				},
-			},
+				method: 'DELETE',
+				url: '=/applications/{{$parameter.applicationId}}/entitlements/{{$parameter.entitlementId}}',
+				successOutput: true,
+			}),
 		],
-		default: 'list',
-	},
+		'list',
+	),
 ];
 
 export const entitlementFields: INodeProperties[] = [
