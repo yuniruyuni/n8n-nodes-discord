@@ -30,7 +30,7 @@ Run this workflow once. Global commands can take up to one hour to propagate; gu
 Use whichever trigger fits your deployment:
 
 - **Discord Trigger** (gateway, bot stays online): Events = `INTERACTION_CREATE`
-- **Discord HTTP Interaction Trigger** (webhook, no persistent connection): see `http-interactions-setup.md`
+- HTTPS-only Interactions Endpoint URL: use n8n's built-in Webhook + Code verification path; see `http-interactions-setup.md`
 
 Filter to your command, e.g. an IF node testing
 `={{ $json.data?.name === 'ping' && $json.type === 2 }}`
