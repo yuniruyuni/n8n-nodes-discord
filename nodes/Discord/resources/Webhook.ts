@@ -17,6 +17,7 @@ import {
 	createTextDisplayField,
 	createV2FileComponentField,
 } from '../shared/components';
+import { showForOperation } from '../shared/displayOptions';
 import { createEmbedsCollectionField } from '../shared/embeds';
 import { applyMessageLikeBody, buildMessageLikePayload } from '../shared/messageLikePayload';
 import { successOutput } from '../shared/routing';
@@ -294,12 +295,6 @@ const channelIdField: INodeProperties = {
 	default: '',
 	required: true,
 	placeholder: 'e.g. 123456789012345678',
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['create', 'getChannelWebhooks'],
-		},
-	},
 	description: 'Channel ID. Discord snowflake ID of the channel.',
 };
 
@@ -310,12 +305,6 @@ const guildIdField: INodeProperties = {
 	default: '',
 	required: true,
 	placeholder: 'e.g. 123456789012345678',
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['getGuildWebhooks'],
-		},
-	},
 	description: 'Guild ID. Discord snowflake ID of the guild.',
 };
 
@@ -326,24 +315,6 @@ const webhookIdField: INodeProperties = {
 	default: '',
 	required: true,
 	placeholder: 'e.g. 123456789012345678',
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: [
-				'get',
-				'getWithToken',
-				'modify',
-				'modifyWithToken',
-				'delete',
-				'deleteWithToken',
-				'executeSlack',
-				'executeGithub',
-				'getMessage',
-				'editMessage',
-				'deleteMessage',
-			],
-		},
-	},
 	description: 'Webhook ID. Discord snowflake ID of the webhook.',
 };
 
@@ -356,21 +327,6 @@ const webhookTokenField: INodeProperties = {
 	},
 	default: '',
 	required: true,
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: [
-				'getWithToken',
-				'modifyWithToken',
-				'deleteWithToken',
-				'executeSlack',
-				'executeGithub',
-				'getMessage',
-				'editMessage',
-				'deleteMessage',
-			],
-		},
-	},
 	description: 'Webhook token. Returned with the webhook object and required for token-scoped endpoints.',
 };
 
@@ -381,12 +337,6 @@ const messageIdField: INodeProperties = {
 	default: '',
 	required: true,
 	placeholder: 'e.g. 123456789012345678',
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['getMessage', 'editMessage', 'deleteMessage'],
-		},
-	},
 	description: 'Message ID. Discord snowflake ID of the webhook message.',
 };
 
@@ -400,12 +350,6 @@ const webhookUrlField: INodeProperties = {
 	default: '',
 	required: true,
 	placeholder: 'https://discord.com/api/webhooks/...',
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute'],
-		},
-	},
 	description: 'Discord webhook URL, including webhook ID and token',
 };
 
@@ -415,12 +359,6 @@ const createNameField: INodeProperties = {
 	type: 'string',
 	default: '',
 	required: true,
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['create'],
-		},
-	},
 	description: 'Name of the webhook (1-80 characters)',
 };
 
@@ -429,12 +367,6 @@ const modifyNameField: INodeProperties = {
 	name: 'name',
 	type: 'string',
 	default: '',
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['modify', 'modifyWithToken'],
-		},
-	},
 	description: 'New webhook name (1-80 characters)',
 };
 
@@ -443,12 +375,6 @@ const createAvatarField: INodeProperties = {
 	name: 'avatar',
 	type: 'string',
 	default: '',
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['create', 'modify', 'modifyWithToken'],
-		},
-	},
 	description: 'Image data URI (data:image/png;base64,...) for the webhook avatar. Empty leaves the avatar unchanged.',
 };
 
@@ -458,12 +384,6 @@ const modifyChannelField: INodeProperties = {
 	type: 'string',
 	default: '',
 	placeholder: 'e.g. 123456789012345678',
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['modify'],
-		},
-	},
 	description: 'Channel ID to move the webhook to. Leave empty to keep the current channel.',
 };
 
@@ -473,12 +393,6 @@ const payloadField: INodeProperties = {
 	type: 'json',
 	default: '{}',
 	required: true,
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['executeSlack', 'executeGithub'],
-		},
-	},
 	description: 'Raw provider-formatted JSON body (Slack or GitHub webhook payload)',
 };
 
@@ -490,12 +404,6 @@ const contentExecuteField: INodeProperties = {
 		rows: 4,
 	},
 	default: '',
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute', 'editMessage'],
-		},
-	},
 	description: 'Message content. Up to 2000 characters.',
 };
 
@@ -504,12 +412,6 @@ const usernameField: INodeProperties = {
 	name: 'username',
 	type: 'string',
 	default: '',
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute'],
-		},
-	},
 	description: 'Override the default username of the webhook for this message',
 };
 
@@ -518,12 +420,6 @@ const avatarUrlField: INodeProperties = {
 	name: 'avatarUrl',
 	type: 'string',
 	default: '',
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute'],
-		},
-	},
 	description: 'Override the default avatar URL of the webhook for this message',
 };
 
@@ -532,12 +428,6 @@ const ttsField: INodeProperties = {
 	name: 'tts',
 	type: 'boolean',
 	default: false,
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute'],
-		},
-	},
 	description: 'Whether the message should be sent as text-to-speech',
 };
 
@@ -546,12 +436,6 @@ const flagsField: INodeProperties = {
 	name: 'flags',
 	type: 'number',
 	default: '',
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute'],
-		},
-	},
 	description:
 		'Bitfield of Discord message flags. Common values: 4 (suppress embeds), 4096 (suppress notifications), 32768 (is components v2).',
 };
@@ -561,12 +445,6 @@ const threadNameField: INodeProperties = {
 	name: 'threadName',
 	type: 'string',
 	default: '',
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute'],
-		},
-	},
 	description: 'Name of the thread to create. Only applies to forum or media channel webhooks.',
 };
 
@@ -576,12 +454,6 @@ const appliedTagsField: INodeProperties = {
 	type: 'string',
 	default: '',
 	placeholder: '123456789012345678, 234567890123456789',
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute'],
-		},
-	},
 	description:
 		'Comma-separated Discord forum tag snowflakes to apply to the new thread. Only used with forum channel webhooks.',
 };
@@ -591,12 +463,6 @@ const pollField: INodeProperties = {
 	name: 'poll',
 	type: 'json',
 	default: '',
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute'],
-		},
-	},
 	placeholder: '{"question":{"text":"Pick"},"answers":[{"poll_media":{"text":"A"}}],"duration":24}',
 	description: 'Raw Discord poll create payload to attach to the message',
 };
@@ -607,19 +473,6 @@ const threadIdField: INodeProperties = {
 	type: 'string',
 	default: '',
 	placeholder: 'e.g. 123456789012345678',
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: [
-				'execute',
-				'executeSlack',
-				'executeGithub',
-				'getMessage',
-				'editMessage',
-				'deleteMessage',
-			],
-		},
-	},
 	description: 'If set, the message is sent to the specified thread within the webhook channel',
 };
 
@@ -628,149 +481,42 @@ const waitField: INodeProperties = {
 	name: 'wait',
 	type: 'boolean',
 	default: false,
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute', 'executeSlack', 'executeGithub'],
-		},
-	},
 	description:
 		'Whether Discord should wait for confirmation and return the created message. Required to receive the message object back.',
 };
 
-const embedsField = createEmbedsCollectionField({
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute', 'editMessage'],
-		},
-	},
-});
+const embedsField = createEmbedsCollectionField();
 
 const buttonRowField = createButtonComponentsField({
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute', 'editMessage'],
-		},
-	},
 	name: 'buttonRow',
 });
 
 const stringSelectField = createStringSelectComponentField({
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute', 'editMessage'],
-		},
-	},
 	name: 'stringSelect',
 });
 
 const mentionableSelectField = createMentionableSelectComponentField({
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute', 'editMessage'],
-		},
-	},
 	name: 'mentionableSelect',
 });
 
-const componentsField = createComponentsJsonField({
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute', 'editMessage'],
-		},
-	},
-});
+const componentsField = createComponentsJsonField();
 
-const textDisplaysField = createTextDisplayField({
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute', 'editMessage'],
-		},
-	},
-});
+const textDisplaysField = createTextDisplayField();
 
-const separatorsField = createSeparatorComponentField({
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute', 'editMessage'],
-		},
-	},
-});
+const separatorsField = createSeparatorComponentField();
 
-const mediaGalleryField = createMediaGalleryField({
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute', 'editMessage'],
-		},
-	},
-});
+const mediaGalleryField = createMediaGalleryField();
 
-const v2FilesField = createV2FileComponentField({
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute', 'editMessage'],
-		},
-	},
-});
+const v2FilesField = createV2FileComponentField();
 
-const attachmentsField = createAttachmentsCollectionField({
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute', 'editMessage'],
-		},
-	},
-});
+const attachmentsField = createAttachmentsCollectionField();
 
-const allowedMentionsField = createAllowedMentionsCollectionField({
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['execute', 'editMessage'],
-		},
-	},
-});
+const allowedMentionsField = createAllowedMentionsCollectionField();
 
-const auditLogReasonField = createAuditLogReasonField({
-	displayOptions: {
-		show: {
-			resource: ['webhook'],
-			operation: ['create', 'modify', 'delete'],
-		},
-	},
-});
+const auditLogReasonField = createAuditLogReasonField();
 
-export const webhookFields: INodeProperties[] = [
-	channelIdField,
-	guildIdField,
-	webhookIdField,
-	webhookTokenField,
-	messageIdField,
-	webhookUrlField,
-	createNameField,
-	modifyNameField,
-	createAvatarField,
-	modifyChannelField,
-	payloadField,
+const webhookMessageFields = [
 	contentExecuteField,
-	usernameField,
-	avatarUrlField,
-	ttsField,
-	flagsField,
-	threadNameField,
-	appliedTagsField,
-	pollField,
-	threadIdField,
-	waitField,
 	embedsField,
 	buttonRowField,
 	stringSelectField,
@@ -782,5 +528,65 @@ export const webhookFields: INodeProperties[] = [
 	v2FilesField,
 	attachmentsField,
 	allowedMentionsField,
-	auditLogReasonField,
+];
+
+export const webhookFields: INodeProperties[] = [
+	...showForOperation('webhook', ['create'], [
+		channelIdField,
+		createNameField,
+		createAvatarField,
+		auditLogReasonField,
+	]),
+	...showForOperation('webhook', ['getChannelWebhooks'], [channelIdField]),
+	...showForOperation('webhook', ['getGuildWebhooks'], [guildIdField]),
+	...showForOperation('webhook', ['get'], [webhookIdField]),
+	...showForOperation('webhook', ['delete'], [webhookIdField, auditLogReasonField]),
+	...showForOperation('webhook', ['modify'], [
+		webhookIdField,
+		modifyNameField,
+		createAvatarField,
+		modifyChannelField,
+		auditLogReasonField,
+	]),
+	...showForOperation('webhook', ['getWithToken'], [webhookIdField, webhookTokenField]),
+	...showForOperation('webhook', ['deleteWithToken'], [webhookIdField, webhookTokenField]),
+	...showForOperation('webhook', ['modifyWithToken'], [
+		webhookIdField,
+		webhookTokenField,
+		modifyNameField,
+		createAvatarField,
+	]),
+	...showForOperation('webhook', ['execute'], [
+		webhookUrlField,
+		...webhookMessageFields,
+		usernameField,
+		avatarUrlField,
+		ttsField,
+		flagsField,
+		threadNameField,
+		appliedTagsField,
+		pollField,
+		threadIdField,
+		waitField,
+	]),
+	...showForOperation('webhook', ['executeSlack', 'executeGithub'], [
+		webhookIdField,
+		webhookTokenField,
+		payloadField,
+		threadIdField,
+		waitField,
+	]),
+	...showForOperation('webhook', ['getMessage', 'deleteMessage'], [
+		webhookIdField,
+		webhookTokenField,
+		messageIdField,
+		threadIdField,
+	]),
+	...showForOperation('webhook', ['editMessage'], [
+		webhookIdField,
+		webhookTokenField,
+		messageIdField,
+		threadIdField,
+		...webhookMessageFields,
+	]),
 ];
