@@ -1,48 +1,70 @@
-# Wire the HTTP Interactions Trigger
+# Receive Interactions Over HTTPS
 
-Receive Discord interactions (slash commands, buttons, modals, ...) over HTTPS instead of the gateway WebSocket. This is the recommended mode for stateless or serverless deployments.
+The package no longer ships a dedicated `Discord HTTP Interaction Trigger`. For most workflows, receive slash commands and component interactions with **Discord Trigger** over the Gateway by selecting `INTERACTION_CREATE`.
 
-## Prerequisites
+If you specifically need Discord's HTTPS **Interactions Endpoint URL** without a bot Gateway connection, use n8n's built-in **Webhook** trigger plus a **Code** node that verifies Discord's Ed25519 signature.
 
-- A Discord application (Developer Portal): note the **Application ID** and **Public Key** under
-  **General Information**
-- A Discord Bot credential in n8n that includes the application's public key (used for Ed25519 signature verification)
-- Your n8n instance is reachable over HTTPS from the public internet (Discord will not accept HTTP or self-signed certs without a trusted CA)
-- Commands registered via the `Application Command` resource (see `slash-command-with-response.md`)
+## Recommended: Gateway Interaction Flow
 
-No gateway intents are required for HTTP interactions.
+Use this when a bot token is acceptable.
 
-## Workflow
+`Discord Trigger (INTERACTION_CREATE)` -> `Discord` (Interaction Response, deferred) -> work nodes -> `Discord` (Interaction Response, followup or edit original)
 
-`Discord HTTP Interaction Trigger` -> `Discord` (Interaction Response, deferred) -> ... work ... -> `Discord` (Interaction Response, follow up)
-
-### Node configuration: Discord HTTP Interaction Trigger
+### Discord Trigger
 
 | Field | Value |
 | --- | --- |
-| Credential | `Discord Bot API` (must include Public Key) |
-| Path | leave as auto-generated, or set e.g. `discord-interactions` |
+| Event | `INTERACTION_CREATE` |
+| Auto Calculate Intents | `true` |
 
-Activate the workflow. n8n exposes a **Production Webhook URL** for the node, for example:
+The trigger emits the interaction payload. Filter to your command or component with an IF node, for example:
 
+```text
+={{ $json.data?.name === 'ping' && $json.type === 2 }}
 ```
-https://n8n.example.com/webhook/discord-interactions
+
+## HTTPS-Only Boundary Flow
+
+Use this when you cannot keep a Gateway connection open. This uses built-in n8n nodes, not a package-provided trigger.
+
+`Webhook` -> `Code` (verify Ed25519 signature) -> `Discord` (Interaction Response, deferred) -> work nodes -> `Discord` (Interaction Response, followup)
+
+### Prerequisites
+
+- A Discord application public key from **Developer Portal > General Information**
+- A production n8n webhook URL reachable over HTTPS
+- Commands registered via the `Application Command` resource
+
+### Webhook Trigger
+
+| Field | Value |
+| --- | --- |
+| HTTP Method | `POST` |
+| Response Mode | `Using Respond to Webhook Node` or equivalent immediate response handling |
+| Path | `discord-interactions` |
+
+Configure the production webhook URL as the application's **Interactions Endpoint URL**.
+
+### Signature Verification
+
+Discord sends these headers:
+
+- `X-Signature-Ed25519`
+- `X-Signature-Timestamp`
+
+Verify `timestamp + rawBody` against the application's public key before trusting the payload. The implementation in `nodes/DiscordWebhookEventTrigger/DiscordWebhookEventTrigger.node.ts` shows the same Ed25519 SPKI wrapping and verification logic used for Discord Application Webhook Events.
+
+### PING Handling
+
+When saving the endpoint URL, Discord sends a PING interaction. Reply immediately:
+
+```json
+{ "type": 1 }
 ```
 
-### Configure the Interactions Endpoint URL
+For normal interactions, either respond within 3 seconds with `Interaction Response > Create Initial Callback`, or defer first with type `5` and send the real result later.
 
-In the Developer Portal, open your application > **General Information** > **Interactions Endpoint URL** and paste the production webhook URL above. Click **Save Changes**.
-
-Discord immediately sends a **PING** (`type: 1`) request signed with your application's private key. The trigger node:
-
-1. Verifies the `X-Signature-Ed25519` header against your stored Public Key
-2. Replies with `{ "type": 1 }` (PONG)
-
-If verification passes, the Developer Portal shows "All your endpoints are valid." The trigger does this automatically — you do not need a branch in the workflow for PING.
-
-## Downstream: deferred response + follow up
-
-Because HTTP interactions also have the 3-second deadline, defer immediately:
+## Deferred Response + Followup
 
 ### Node 1: Discord (Interaction Response)
 
@@ -52,32 +74,16 @@ Because HTTP interactions also have the 3-second deadline, defer immediately:
 | Operation | `Create Initial Callback` |
 | Interaction ID | `={{ $json.id }}` |
 | Interaction Token | `={{ $json.token }}` |
-| Type | `5` (DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE) |
+| Type | `5` (`DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE`) |
 
-Discord shows "Bot is thinking..." to the user.
-
-### ... your real work nodes here (HTTP calls, AI, database, etc.) ...
-
-### Node 2: Discord (Interaction Response, follow up)
+### Node 2: Discord (Interaction Response)
 
 | Field | Value |
 | --- | --- |
 | Resource | `Interaction Response` |
 | Operation | `Create Followup Message` |
 | Application ID | `123456789012345678` |
-| Interaction Token | `={{ $('Discord HTTP Interaction Trigger').item.json.token }}` |
+| Interaction Token | `={{ $json.token }}` |
 | Content | `Done! Result: {{ $json.result }}` |
 
-Followups can be sent for up to **15 minutes** after the original interaction.
-
-## What to expect
-
-- Saving the Interactions Endpoint URL: a single PING then "valid" confirmation
-- User invokes the command: trigger fires with the interaction payload, immediate "thinking" indicator appears, real reply lands when the followup posts
-- The trigger node itself returns a `200` with the PONG/deferred ACK; n8n's normal item flow continues from its output
-
-## Common pitfalls
-
-- "Interactions endpoint URL could not be verified": Public Key mismatch in the credential, workflow not activated, or URL not publicly reachable
-- "The application did not respond": you did not send an initial callback within 3 seconds; defer first, then follow up
-- Using the test webhook URL: it only stays live while the editor is open — always use the **Production** URL for the Developer Portal
+Followups can be sent for up to 15 minutes after the original interaction.

@@ -6,22 +6,12 @@ import type {
 } from 'n8n-workflow';
 
 import { createRawJsonField, parseOptionalJsonField } from '../shared/messagePayload';
+import { createOperationSelector, defineDiscordRestOperation } from '../shared/operation';
 import {
 	aggregateDiscordPermissions,
 	discordPermissionOptions,
 	type DiscordPermissionName,
 } from '../shared/permissions';
-
-const successResponse = {
-	postReceive: [
-		{
-			type: 'set' as const,
-			properties: {
-				value: '={{ { "success": true } }}',
-			},
-		},
-	],
-};
 
 // Approach: create/edit operations use a preSend hook to assemble the body so we
 // can compose the guided `commandOptions` builder, the guided localization
@@ -336,191 +326,119 @@ export async function presendApplicationCommand(
 }
 
 export const applicationCommandOperations: INodeProperties[] = [
-	{
-		displayName: 'Operation',
-		name: 'operation',
-		type: 'options',
-		noDataExpression: true,
-		displayOptions: {
-			show: {
-				resource: ['applicationCommand'],
-			},
-		},
-		options: [
-			{
+	createOperationSelector(
+		'applicationCommand',
+		[
+			defineDiscordRestOperation({
 				name: 'Bulk Overwrite Global',
 				value: 'bulkOverwriteGlobal',
 				action: 'Bulk overwrite global',
-				routing: {
-					request: {
-						method: 'PUT',
-						url: '=/applications/{{$parameter.applicationId}}/commands',
-						body: rawJsonBody,
-					},
-				},
-			},
-			{
+				method: 'PUT',
+				url: '=/applications/{{$parameter.applicationId}}/commands',
+				body: rawJsonBody,
+			}),
+			defineDiscordRestOperation({
 				name: 'Bulk Overwrite Guild',
 				value: 'bulkOverwriteGuild',
 				action: 'Bulk overwrite guild',
-				routing: {
-					request: {
-						method: 'PUT',
-						url: '=/applications/{{$parameter.applicationId}}/guilds/{{$parameter.guildId}}/commands',
-						body: rawJsonBody,
-					},
-				},
-			},
-			{
+				method: 'PUT',
+				url: '=/applications/{{$parameter.applicationId}}/guilds/{{$parameter.guildId}}/commands',
+				body: rawJsonBody,
+			}),
+			defineDiscordRestOperation({
 				name: 'Create Global',
 				value: 'createGlobal',
 				action: 'Create global',
-				routing: {
-					send: {
-						preSend: [presendApplicationCommand],
-					},
-					request: {
-						method: 'POST',
-						url: '=/applications/{{$parameter.applicationId}}/commands',
-					},
-				},
-			},
-			{
+				method: 'POST',
+				url: '=/applications/{{$parameter.applicationId}}/commands',
+				preSend: [presendApplicationCommand],
+			}),
+			defineDiscordRestOperation({
 				name: 'Create Guild',
 				value: 'createGuild',
 				action: 'Create guild',
-				routing: {
-					send: {
-						preSend: [presendApplicationCommand],
-					},
-					request: {
-						method: 'POST',
-						url: '=/applications/{{$parameter.applicationId}}/guilds/{{$parameter.guildId}}/commands',
-					},
-				},
-			},
-			{
+				method: 'POST',
+				url: '=/applications/{{$parameter.applicationId}}/guilds/{{$parameter.guildId}}/commands',
+				preSend: [presendApplicationCommand],
+			}),
+			defineDiscordRestOperation({
 				name: 'Delete Global',
 				value: 'deleteGlobal',
 				action: 'Delete global',
-				routing: {
-					request: {
-						method: 'DELETE',
-						url: '=/applications/{{$parameter.applicationId}}/commands/{{$parameter.commandId}}',
-					},
-					output: successResponse,
-				},
-			},
-			{
+				method: 'DELETE',
+				url: '=/applications/{{$parameter.applicationId}}/commands/{{$parameter.commandId}}',
+				successOutput: true,
+			}),
+			defineDiscordRestOperation({
 				name: 'Delete Guild',
 				value: 'deleteGuild',
 				action: 'Delete guild',
-				routing: {
-					request: {
-						method: 'DELETE',
-						url: '=/applications/{{$parameter.applicationId}}/guilds/{{$parameter.guildId}}/commands/{{$parameter.commandId}}',
-					},
-					output: successResponse,
-				},
-			},
-			{
+				method: 'DELETE',
+				url: '=/applications/{{$parameter.applicationId}}/guilds/{{$parameter.guildId}}/commands/{{$parameter.commandId}}',
+				successOutput: true,
+			}),
+			defineDiscordRestOperation({
 				name: 'Get Global',
 				value: 'getGlobal',
 				action: 'Get global',
-				routing: {
-					request: {
-						method: 'GET',
-						url: '=/applications/{{$parameter.applicationId}}/commands/{{$parameter.commandId}}',
-					},
-				},
-			},
-			{
+				method: 'GET',
+				url: '=/applications/{{$parameter.applicationId}}/commands/{{$parameter.commandId}}',
+			}),
+			defineDiscordRestOperation({
 				name: 'Get Guild',
 				value: 'getGuild',
 				action: 'Get guild',
-				routing: {
-					request: {
-						method: 'GET',
-						url: '=/applications/{{$parameter.applicationId}}/guilds/{{$parameter.guildId}}/commands/{{$parameter.commandId}}',
-					},
-				},
-			},
-			{
+				method: 'GET',
+				url: '=/applications/{{$parameter.applicationId}}/guilds/{{$parameter.guildId}}/commands/{{$parameter.commandId}}',
+			}),
+			defineDiscordRestOperation({
 				name: 'Get Guild Command Permissions',
 				value: 'getGuildCommandPermissions',
 				action: 'Get guild command permissions',
-				routing: {
-					request: {
-						method: 'GET',
-						url: '=/applications/{{$parameter.applicationId}}/guilds/{{$parameter.guildId}}/commands/{{$parameter.commandId}}/permissions',
-					},
-				},
-			},
-			{
+				method: 'GET',
+				url: '=/applications/{{$parameter.applicationId}}/guilds/{{$parameter.guildId}}/commands/{{$parameter.commandId}}/permissions',
+			}),
+			defineDiscordRestOperation({
 				name: 'List Global',
 				value: 'listGlobal',
 				action: 'List global',
-				routing: {
-					request: {
-						method: 'GET',
-						url: '=/applications/{{$parameter.applicationId}}/commands',
-					},
-				},
-			},
-			{
+				method: 'GET',
+				url: '=/applications/{{$parameter.applicationId}}/commands',
+			}),
+			defineDiscordRestOperation({
 				name: 'List Guild',
 				value: 'listGuild',
 				action: 'List guild',
-				routing: {
-					request: {
-						method: 'GET',
-						url: '=/applications/{{$parameter.applicationId}}/guilds/{{$parameter.guildId}}/commands',
-					},
-				},
-			},
-			{
+				method: 'GET',
+				url: '=/applications/{{$parameter.applicationId}}/guilds/{{$parameter.guildId}}/commands',
+			}),
+			defineDiscordRestOperation({
 				name: 'Update Global',
 				value: 'updateGlobal',
 				action: 'Update global',
-				routing: {
-					send: {
-						preSend: [presendApplicationCommand],
-					},
-					request: {
-						method: 'PATCH',
-						url: '=/applications/{{$parameter.applicationId}}/commands/{{$parameter.commandId}}',
-					},
-				},
-			},
-			{
+				method: 'PATCH',
+				url: '=/applications/{{$parameter.applicationId}}/commands/{{$parameter.commandId}}',
+				preSend: [presendApplicationCommand],
+			}),
+			defineDiscordRestOperation({
 				name: 'Update Guild',
 				value: 'updateGuild',
 				action: 'Update guild',
-				routing: {
-					send: {
-						preSend: [presendApplicationCommand],
-					},
-					request: {
-						method: 'PATCH',
-						url: '=/applications/{{$parameter.applicationId}}/guilds/{{$parameter.guildId}}/commands/{{$parameter.commandId}}',
-					},
-				},
-			},
-			{
+				method: 'PATCH',
+				url: '=/applications/{{$parameter.applicationId}}/guilds/{{$parameter.guildId}}/commands/{{$parameter.commandId}}',
+				preSend: [presendApplicationCommand],
+			}),
+			defineDiscordRestOperation({
 				name: 'Update Guild Command Permissions',
 				value: 'updateGuildCommandPermissions',
 				action: 'Update guild command permissions',
-				routing: {
-					request: {
-						method: 'PUT',
-						url: '=/applications/{{$parameter.applicationId}}/guilds/{{$parameter.guildId}}/commands/{{$parameter.commandId}}/permissions',
-						body: rawJsonBody,
-					},
-				},
-			},
+				method: 'PUT',
+				url: '=/applications/{{$parameter.applicationId}}/guilds/{{$parameter.guildId}}/commands/{{$parameter.commandId}}/permissions',
+				body: rawJsonBody,
+			}),
 		],
-		default: 'listGlobal',
-	},
+		'listGlobal',
+	),
 ];
 
 export const applicationCommandFields: INodeProperties[] = [
