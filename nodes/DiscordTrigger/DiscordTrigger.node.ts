@@ -1,5 +1,6 @@
 import {
 	NodeConnectionTypes,
+	NodeOperationError,
 	type IDataObject,
 	type INodeType,
 	type INodeTypeDescription,
@@ -99,7 +100,7 @@ export class DiscordTrigger implements INodeType {
 				activeConnections.delete(nodeId);
 			}
 			unregisterGatewaySender(connectionName, sender);
-			throw error;
+			throw new NodeOperationError(this.getNode(), error as Error);
 		}
 
 		return {
