@@ -58,7 +58,6 @@ export class DiscordTrigger implements INodeType {
 		defaults: {
 			name: 'Discord Trigger',
 		},
-		usableAsTool: true,
 		codex: {
 			categories: ['Communication'],
 			subcategories: {

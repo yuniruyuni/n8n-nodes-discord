@@ -151,7 +151,6 @@ export class DiscordWebhookEventTrigger implements INodeType {
 		defaults: {
 			name: 'Discord Webhook Event Trigger',
 		},
-		usableAsTool: true,
 		inputs: [],
 		outputs: [NodeConnectionTypes.Main],
 		credentials: [
