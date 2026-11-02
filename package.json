@@ -1,6 +1,6 @@
 {
   "name": "@yuniruyuni/n8n-nodes-discord",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "n8n node for Discord API integration. Supports Discord REST operations, webhooks, interactions, and Gateway triggers.",
   "license": "MIT",
   "homepage": "https://github.com/yuniruyuni/n8n-nodes-discord",
@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@n8n/node-cli": "*",
-    "@types/node": "^25.5.0",
+    "@types/node": "^26.0.0",
     "eslint": "9.39.5",
     "n8n-workflow": "3.0.1",
     "prettier": "3.9.10",
